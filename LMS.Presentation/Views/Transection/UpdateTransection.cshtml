@@ -1,0 +1,225 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Transection.UpdateTransectionDto
+
+@{
+    ViewData["Id"] = "updateTransectionModel";
+    ViewData["ModelTitle"] = "Update Transection";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+
+    var isAdmin = User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin));
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .update-transection-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<form asp-action="UpdateTransection" class="needs-validation" id="updateTransectionForm" method="post">
+    <div class="d-flex justify-content-end gap-3 mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" id="IsDefaultDueDate" type="checkbox" asp-for="IsDefaultDueDate" checked>
+            <label class="form-check-label" asp-for="IsDefaultDueDate">Default Due date</label>
+        </div>
+        <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="right" title="For default update renew count based on the status of the check-out or just keep same value as the field contain">
+            <input class="form-check-input" id="IsCountRenew" type="checkbox" asp-for="IsCountRenew" checked>
+            <label class="form-check-label" asp-for="IsCountRenew">Count Renew?</label>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6 update-transection-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-transection-form-userId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.Users"
+                        asp-for="UserId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="UserId" class="did-floating-label">User</label>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6 update-transection-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-transection-form-bookId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.Books"
+                        asp-for="BookId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="BookId" class="did-floating-label">Book</label>
+                <span asp-validation-for="BookId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6">
+            <div class="did-floating-label-content">
+                <select id="update-transection-form-statusId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.TransectionStatusList"
+                        asp-for="StatusId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="StatusId" class="did-floating-label">Status</label>
+                <span asp-validation-for="StatusId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md update-transection-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="BorrowDate" type="datetime-local" class="did-floating-input" id="borrowDate" value='@Model.BorrowDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="BorrowDate" class="did-floating-label">Borrow Date<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="BorrowDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md update-transection-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="RenewDate" type="datetime-local" class="did-floating-input" id="renewDate" value='@Model.RenewDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="RenewDate" class="did-floating-label">Renew Date</label>
+                <span asp-validation-for="RenewDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md update-transection-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="RenewCount" type="number" class="did-floating-input restrict-dot" id="renewCount" placeholder="" />
+                <label asp-for="RenewCount" class="did-floating-label">Renew Count</label>
+                <span asp-validation-for="RenewCount" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md update-transection-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="DueDate" type="datetime-local" class="did-floating-input" id="dueDate" value='@Model.DueDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="DueDate" class="did-floating-label">Due Date</label>
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6 update-transection-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="ReturnDate" type="datetime-local" class="did-floating-input" id="returnDate" value='@Model.ReturnDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="ReturnDate" class="did-floating-label">Return Date</label>
+                <span asp-validation-for="ReturnDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="update-transection-form-col">
+        <div class="did-floating-label-content">
+            <input asp-for="LostClaimDate" type="datetime-local" class="did-floating-input" id="lostClaimDate" value='@Model.LostClaimDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+            <label asp-for="LostClaimDate" class="did-floating-label">Lost Claim Date</label>
+            <span asp-validation-for="LostClaimDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="update-transection-btn">Update Transection</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var oldBorrowDate = "@Model.BorrowDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var oldDueDate = "@Model.DueDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var oldReturnDate = "@Model.ReturnDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var oldRenewDate = "@Model.RenewDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var oldLostClaimDate = "@Model.LostClaimDate?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var oldRenewCount = "@Model.RenewCount";
+
+        removeSingleDropdownValueAttr('#updateTransectionForm #update-transection-form-userId');
+        removeSingleDropdownValueAttr('#updateTransectionForm #update-transection-form-bookId');
+        removeSingleDropdownValueAttr('#updateTransectionForm #update-transection-form-statusId');
+
+        readonlySelect2('#updateTransectionForm #update-transection-form-userId, #updateTransectionForm #update-transection-form-bookId');
+
+        toggleDueDate("#IsDefaultDueDate", oldBorrowDate, oldDueDate);
+        toggleRenewCount("#IsCountRenew", oldRenewCount);
+        toggleReturnDate("#update-transection-form-statusId", oldReturnDate);
+        toggleRenewDate("#update-transection-form-statusId", oldRenewDate);
+        toggleLostClaimDate("#update-transection-form-statusId", oldLostClaimDate);
+
+        if ('@isAdmin'.toLowerCase() == 'true')
+            enableField("#updateTransectionForm #IsCountRenew");
+        else
+            readonlyField("#updateTransectionForm #IsCountRenew");
+
+        if ($('#updateTransectionModel').length && $('#updateTransectionModel').is(':hidden'))
+        {
+            $('#updateTransectionModel').modal('show');
+        }
+
+        $("#IsDefaultDueDate").off("change").on("change", function () { toggleDueDate(this, oldBorrowDate, oldDueDate); });
+        $("#IsCountRenew").off("change").on("change", function () { toggleRenewCount(this, oldRenewCount); });
+        $("#update-transection-form-statusId").on("change", function () 
+        { 
+            toggleReturnDate(this, oldReturnDate); 
+            toggleRenewDate(this, oldRenewDate); 
+            toggleLostClaimDate(this, oldLostClaimDate);
+        });
+
+        $("#borrowDate").off("change").on("change", function () { validateDates(this); });
+        $("#dueDate").off("change").on("change", function () { validateDates(this); });
+        $("#returnDate").off("change").on("change", function () { validateDates(this); });
+        $("#lostClaimDate").off("change").on("change", function () { validateDates(this); });
+
+    });
+
+    $(document).off("submit", "#updateTransectionForm").on("submit", "#updateTransectionForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-transection-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updateTransectionModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-transection-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-transection-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

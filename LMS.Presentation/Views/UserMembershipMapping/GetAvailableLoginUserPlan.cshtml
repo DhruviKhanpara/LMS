@@ -1,0 +1,158 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@model LMS.Presentation.Views.Shared.Models.PlanSelectionModelBodyViewModel
+
+@{
+    ViewData["Id"] = "planSelectionModal";
+    ViewData["ModelTitle"] = "Proceed with the Plan";
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/themes/light/modalbody.css" asp-append-version="true" />
+
+<div class="d-flex justify-content-between modal-body-custom pt-3">
+    <div class="col-md-5 d-flex flex-column justify-content-center gap-4">
+        <div class="d-none model-body-card-heading">@Html.Heading(Model.AvailablePlansTitle)</div>
+        <div class="d-flex flex-column align-items-center justify-content-center model-body-pricing-cards">
+            @if (Model.AvailablePlans.Any())
+            {
+                @foreach (var item in Model.AvailablePlans)
+                {
+                    <div class="pricing-card">
+                        <span class="badge bg-color-purple">@Html.DisplayFor(modelItem => item.MembershipType)</span>
+                        <h2 class="price color-purple">
+                            <i class="fa fa-inr" aria-hidden="true"></i>
+                            @Html.DisplayFor(modelItem => item.PaidAmount)
+                            <span>/ per plan</span>
+                        </h2>
+                        <div class="color-gray text-justify mb-2">@Html.DisplayFor(modelItem => item.MembershipDescription)</div>
+                        <ul>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.BorrowLimit) :</b>
+                                @Html.DisplayFor(modelItem => item.BorrowLimit) books at a time
+                            </li>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.ReservationLimit) :</b>
+                                @Html.DisplayFor(modelItem => item.ReservationLimit) books at a time
+                            </li>
+                            <li>
+                                <b>From</b> @item.EffectiveStartDate.Date.ToString("dd/MM/yyyy")
+                                <b>To</b> @item.ExpirationDate.Date.ToString("dd/MM/yyyy")
+                            </li>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.Discount) :</b>
+                                @Html.DisplayFor(modelItem => item.Discount)
+                            </li>
+                        </ul>
+                    </div>
+                }
+            }
+            else
+            {
+                <h3 class="color-purple">No Plan available</h3>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-2 d-flex flex-column mb-4 align-items-center justify-content-center">
+        <div class="d-flex flex-column gap-2 justify-content-center px-3 h-100 model-body-pricing-operation">
+            <div>
+                <a id="upgrade-btn" class="btn btn-submit w-100 mt-3 mb-2 color-purple" asp-area="" asp-controller="UserMembershipMapping" asp-action="UpgradeLatestPlan">Upgrade</a>
+            </div>
+            <div>
+                <img src="~/assets/Images/swap.gif" width="80" />
+            </div>
+            <div>
+                <a id="add-btn" class="btn btn-submit w-100 mt-3 mb-2 color-purple" asp-area="" asp-controller="UserMembershipMapping" asp-action="AddNewPlan">Add</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5 d-flex flex-column justify-content-center gap-4">
+        <div class="d-none model-body-card-heading">@Html.Heading(Model.SelectedPlansTitle)</div>
+        <div class="d-flex flex-row align-items-center justify-content-center model-body-pricing-cards">
+            @if (Model.SelectedPlan != null)
+            {
+                decimal price = Model.SelectedPlan.Cost - Model.SelectedPlan.Discount;
+
+                <div class="pricing-card">
+                    <span class="badge bg-color-purple">@Html.DisplayFor(modelItem => modelItem.SelectedPlan!.Type)</span>
+                    <h2 class="price color-purple">
+                        <i class="fa fa-inr" aria-hidden="true"></i>
+                        <del>@Html.DisplayFor(modelItem => modelItem.SelectedPlan!.Cost)</del> @Html.DisplayFor(modelItem => price)
+                        <span>/ per plan</span>
+                    </h2>
+                    <div class="color-gray text-justify mb-2">@Html.DisplayFor(modelItem => modelItem.SelectedPlan!.Description)</div>
+                    <ul>
+                        <li>
+                            <b>@Html.DisplayNameFor(modelItem => modelItem.SelectedPlan!.BorrowLimit) :</b>
+                            @Html.DisplayFor(modelItem => modelItem.SelectedPlan!.BorrowLimit) books at a time
+                        </li>
+                        <li>
+                            <b>@Html.DisplayNameFor(modelItem => modelItem.SelectedPlan!.ReservationLimit) :</b>
+                            @Html.DisplayFor(modelItem => modelItem.SelectedPlan!.ReservationLimit) books at a time
+                        </li>
+                        <li>
+                            <b>@Html.DisplayNameFor(modelItem => modelItem.SelectedPlan!.Duration) :</b>
+                            @Html.DisplayFor(modelItem => modelItem.SelectedPlan!.Duration) Days
+                        </li>
+                        <li>
+                            <b>@Html.DisplayNameFor(modelItem => modelItem.SelectedPlan!.Discount) :</b>
+                            @Html.DisplayFor(modelItem => modelItem.SelectedPlan!.Discount)
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <h3 class="color-purple">No Plan selected</h3>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        var availablePlans = @Html.Raw(Json.Serialize(Model.AvailablePlans));
+        var selectedPlan = @Html.Raw(Json.Serialize(Model.SelectedPlan));
+        var maxActiveLimit = @Html.Raw(Model.MaxAvailablePlanLimit);
+
+        if (!availablePlans || availablePlans.length === 0)
+        {
+            toggleButtonState('#upgrade-btn', true, 'color-purple btn-submit');
+        }
+        else
+        {
+            $('#upgrade-btn').off("click").on("click", function (event)
+            {
+                event.preventDefault();
+                var message = "After proceed your latest plan will remove and seleted plan will take it's place. Are you sure you want to purchase and upgrade? You can't revert the action after proceeding.";
+                setProceedButtonHref(this, message, "membershipId=" + selectedPlan.id);
+            });
+        }
+
+        if (availablePlans.length === maxActiveLimit)
+        {
+            toggleButtonState('#add-btn', true, 'color-purple btn-submit');
+        }
+        else
+        {
+            $('#add-btn').off("click").on("click", function (event)
+            {
+                event.preventDefault();
+                var message = "Are you sure you want to purchase this plan?";
+                setProceedButtonHref(this, message, "membershipId=" + selectedPlan.id);
+            });
+        }
+
+        $('#confirmationModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            $('#planSelectionModal').css('z-index', 1051);
+        });
+
+        $('#confirmationModal').off("show.bs.modal").on("show.bs.modal", function ()
+        {
+            $('#planSelectionModal').css('z-index', 1050);
+        });
+    });
+</script>

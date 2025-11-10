@@ -1,0 +1,316 @@
+﻿@using System.Linq;
+
+@model LMS.Application.Contracts.DTOs.Home.LibrarianDashboardDto;
+
+@{
+    ViewData["Title"] = "LibrarianDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var checkoutLabels = Model.CheckoutsVisualization.Select(x => x.Label).ToArray();
+    var checkoutData = Model.CheckoutsVisualization.Select(x => x.Data).ToArray();
+    var returnData = Model.ReturnVisualization.Select(x => x.Data).ToArray();
+    var reservationLabels = Model.ReservationVisualization.Select(x => x.Label).ToArray();
+    var reservationData = Model.ReservationVisualization.Select(x => x.Data).ToArray();
+    var cancelData = Model.CancelVisualization.Select(x => x.Data).ToArray();
+}
+
+<style>
+    .clip {
+        padding: 3px;
+        background-color: #5a2d82;
+        border-radius: 10px 0 0 10px;
+    }
+
+    .intro-card img {
+        width: 100%;
+    }
+
+    @@media (max-width: 550px) {
+        .intro-card {
+            display: none;
+        }
+    }
+</style>
+
+<script src="~/js/chart.js" asp-append-version="true"></script>
+
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between bg-color-light-gray rounded-3">
+        <div class="d-flex flex-grow-1 justify-content-center flex-column ps-4 py-3">
+            <h2 class="color-purple">Welcome back, @Model.User!</h2>
+            <p>Knowledge is the passport of the future, So learn more & more</p>
+        </div>
+        <div class="intro-card d-flex justify-content-center align-items-center w-25 overflow-hidden">
+            <img src="~/assets/Images/LMS_Home_2.png" />
+        </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center my-3 gap-3">
+        <div class="card w-50 justify-content-end">
+            <div class="py-2">
+                <h4 class="text-center m-0 color-purple">Reservation Overview</h4>
+                <canvas id="visualize-reservation"></canvas>
+            </div>
+        </div>
+        <div class="card flex-grow-1 justify-content-end">
+            <div class="py-2">
+                <h4 class="text-center m-0 color-purple">Borrow History</h4>
+                <canvas id="visualize-checkouts"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center my-3 gap-3">
+        <div class="card flex-grow-1">
+            <div class="d-flex justify-content-between gap-1 ps-2 pt-1">
+                <div class="color-gray">
+                    Active Memberships
+                    <i class="bi bi-info-circle cursor-pointer @(Model.TotalActiveMembership == 0 ? "text-danger" : "text-success")" data-bs-toggle="tooltip" data-bs-placement="right" title="Total active membership hold by the user"></i>
+                </div>
+                <div class="pe-2">
+                    <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="UserMembershipMapping" asp-action="GetUserMemberships">See more</a>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center my-2">
+                <h4 class="color-purple">@Model.TotalActiveMembership</h4>
+            </div>
+        </div>
+        <div class="card flex-grow-1">
+            <div class="d-flex justify-content-between gap-1 ps-2 pt-1">
+                <div class="color-gray">
+                    Total Check-outs
+                    <i class="bi bi-info-circle text-dark cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="right" title="Total checkouts done by users"></i>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center my-2">
+                <h4 class="color-purple">@Model.TotalCheckout</h4>
+            </div>
+        </div>
+        <div class="card flex-grow-1">
+            <div class="d-flex justify-content-between gap-1 ps-2 pt-1">
+                <div class="color-gray">
+                    Total active Reservations
+                    <i class="bi bi-info-circle text-dark cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="right" title="Total reservation done by user"></i>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center my-2">
+                <h4 class="color-purple">@Model.TotalReservation</h4>
+            </div>
+        </div>
+        <div class="card flex-grow-1">
+            <div class="d-flex justify-content-between gap-1 ps-2 pt-1">
+                <div class="color-gray">
+                    Total un-paid penalty amount
+                    <i class="bi bi-info-circle @(Model.UnpaidPenaltyAmount != 0 ? "text-danger" : "text-success") cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="right" title="Total un-paid penalty amount"></i>
+                </div>
+                <div class="pe-2">
+                    <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Penalty" asp-action="GetPenalty">See more</a>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center my-2">
+                <h4 class="color-purple">@Model.UnpaidPenaltyAmount <i class="fa fa-inr" aria-hidden="true"></i></h4>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center my-3 gap-3">
+        <div class="card">
+            <div class="bg-color-light-gray d-flex justify-content-center py-2">
+                <h4 class="color-purple text-center">Recent Check-out History</h4>
+            </div>
+            <div class="px-4 pt-2">
+                <div class="table-responsive scrollable-table">
+                    <table class="table">
+                        <thead>
+                            <tr style="background: white">
+                                <th>Status</th>
+                                <th>User</th>
+                                <th>Book</th>
+                                <th>Author</th>
+                                <th class="text-center">Borrow date</th>
+                                <th class="text-center">Renew date</th>
+                                <th class="text-center"> Due date</th>
+                                <th class="text-center">Return date</th>
+                                <th class="text-center">Lost claim date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentCheckOuts.Any())
+                            {
+                                @foreach (var item in Model.RecentCheckOuts)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <div class="status-clip @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                                 style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                                @Html.DisplayFor(modelItem => item.StatusLabel)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img src="@item.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" />
+                                            @Html.DisplayFor(modelItem => item.UserName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BookName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BookAuthor)
+                                        </td>
+                                        <td class="text-center">
+                                            @item.BorrowDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                                        </td>
+                                        <td class="text-center">
+                                            @(item.RenewDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                                        </td>
+                                        <td class="text-center">
+                                            @item.DueDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                                        </td>
+                                        <td class="text-center">
+                                            @(item.ReturnDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                                        </td>
+                                        <td class="text-center">
+                                            @(item.LostClaimDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center border-0">No records found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-2 mt-1 me-4">
+                <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Transection" asp-action="GetTransections">See more</a>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-baseline gap-3 my-3">
+        <div class="card flex-fill" style="z-index: 2;">
+            <div class="bg-color-light-gray d-flex justify-content-center py-2">
+                <h4 class="color-purple text-center">Un-paid Penalties</h4>
+            </div>
+            <div class="px-4 pt-2">
+                <div class="table-responsive scrollable-table">
+                    <table class="table">
+                        <thead>
+                            <tr style="background: white">
+                                <th>User</th>
+                                <th class="text-center">Penalty Type</th>
+                                <th class="text-center">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.UnpaidPenalty.Any())
+                            {
+                                @foreach (var item in Model.UnpaidPenalty)
+                                {
+                                    <tr>
+                                        <td>
+                                            <img src="@item.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" />
+                                            @Html.DisplayFor(modelItem => item.UserName)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.DisplayFor(modelItem => item.PenaltyTypeName)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.DisplayFor(modelItem => item.Amount) <i class="fa fa-inr" aria-hidden="true"></i>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center border-0">No records found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-2 mt-1 me-4">
+                <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Penalty" asp-action="GetPenalty">See more</a>
+            </div>
+        </div>
+        <div class="card flex-fill">
+            <div class="bg-color-light-gray d-flex justify-content-center py-2">
+                <h4 class="color-purple text-center">Overdue Check-outs</h4>
+            </div>
+            <div class="px-4 pt-2">
+                <div class="table-responsive scrollable-table">
+                    <table class="table">
+                        <thead>
+                            <tr style="background: white">
+                                <th>Status</th>
+                                <th>User</th>
+                                <th>Book</th>
+                                <th class="text-center">Overdue Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.OverdueCheckouts.Any())
+                            {
+                                @foreach (var item in Model.OverdueCheckouts)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <div class="status-clip @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                                 style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                                @Html.DisplayFor(modelItem => item.StatusLabel)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img src="@item.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" />
+                                            @Html.DisplayFor(modelItem => item.UserName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BookName)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.DisplayFor(modelItem => item.OverdueDays)
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center border-0">No records found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-2 mt-1 me-4">
+                <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Transection" asp-action="GetTransections">See more</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        lineChart(
+            "visualize-reservation",
+            ["Reservation Overview", "Cancel Overview"],
+            @Html.Raw(Json.Serialize(reservationLabels)),
+            ['#5a2d82', '#ccc'],
+            [@Html.Raw(Json.Serialize(reservationData)), @Html.Raw(Json.Serialize(cancelData))],
+            false, true, true, true, true
+        );
+
+        lineChart(
+            "visualize-checkouts",
+            ["Borrowing History", "Return History"],
+            @Html.Raw(Json.Serialize(checkoutLabels)),
+            ['#5a2d82', '#f26419'],
+            [@Html.Raw(Json.Serialize(checkoutData)), @Html.Raw(Json.Serialize(returnData))],
+            false, true, true, true, true
+        );
+    });
+</script>

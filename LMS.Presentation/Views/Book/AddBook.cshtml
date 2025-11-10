@@ -1,0 +1,207 @@
+﻿@model LMS.Application.Contracts.DTOs.Books.AddBookDto
+
+@{
+    ViewData["Id"] = "addBookModel";
+    ViewData["ModelTitle"] = "Add Book";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .add-book-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+<form asp-action="AddBook" class="needs-validation" id="addBookForm" method="post" enctype="multipart/form-data">
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="Title" class="did-floating-input" placeholder="" />
+            <label asp-for="Title" class="did-floating-label">Title<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="BookDescription" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="BookDescription" class="did-floating-label">Book Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="BookDescription" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Isbn" class="did-floating-input" placeholder="" />
+                <label asp-for="Isbn" class="did-floating-label">ISBN<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Isbn" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Price" type="number" class="did-floating-input" placeholder="" />
+                <label asp-for="Price" class="did-floating-label">Price<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <select id="add-book-form-genreId"
+                    class="did-floating-select select2-single"
+                    asp-items="@Model.GenreList"
+                    asp-for="GenreId"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+                </select>
+                <label asp-for="GenreId" class="did-floating-label">Genre<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="GenreId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Author" class="did-floating-input" placeholder="" />
+                <label asp-for="Author" class="did-floating-label">Author<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Publisher" class="did-floating-input" placeholder="" />
+                <label asp-for="Publisher" class="did-floating-label">Publisher<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Publisher" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="AuthorDescription" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="AuthorDescription" class="did-floating-label">Author Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="AuthorDescription" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="PublishAt" type="datetime-local" max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' class="did-floating-input" placeholder="" />
+                <label asp-for="PublishAt" class="did-floating-label">Publish Date<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="PublishAt" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <select id="add-book-form-statusId"
+                    class="did-floating-select select2-single"
+                    asp-items="@Model.BookStatusList"
+                    asp-for="StatusId"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="StatusId" class="did-floating-label">Status<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="StatusId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 add-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="TotalCopies" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="TotalCopies" class="did-floating-label">Total Copy<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="TotalCopies" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md add-book-form-col">
+            <div class="mb-2">
+                <label asp-for="CoverPage" class="control-label">Cover Page<sup class="text-danger">*</sup></label>
+                <input asp-for="CoverPage" type="file" accept=".jpg, .jpeg, .png" class="form-control file-input" />
+                <span asp-validation-for="CoverPage" class="text-danger"></span>
+            </div>
+            <div class="file-preview"></div>
+        </div>
+        <div class="col-md add-book-form-col">
+            <div class="mb-2">
+                <label asp-for="BookPreview" class="control-label">Book Preview</label>
+                <input asp-for="BookPreview" type="file" accept=".pdf" class="form-control file-input" />
+                <span asp-validation-for="BookPreview" class="text-danger"></span>
+            </div>
+            <div class="file-preview"></div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="add-book-btn">Add Book</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#addBookForm #add-book-form-statusId');
+        removeSingleDropdownValueAttr('#addBookForm #add-book-form-genreId');
+
+        if ($('#addBookModel').length && $('#addBookModel').is(':hidden'))
+        {
+            $('#addBookModel').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#addBookForm").on("submit", "#addBookForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-book-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addBookModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-book-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-book-btn', false, 'color-purple btn-submit');
+        }
+    });
+
+    $('#transparentModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#addBookModel').css('z-index', 1051);
+    });
+
+    $('#transparentModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#addBookModel').css('z-index', 1050);
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

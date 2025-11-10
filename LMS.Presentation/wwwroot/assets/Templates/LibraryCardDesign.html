@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>ID Card</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            /* Utility classes */
+            .bg-white { background-color: #fff; }
+            .bg-color-purple { background-color: #5a2d82; }
+            .color-purple { color: #5a2d82; }
+            .text-white { color: #fff; }
+            .text-center { text-align: center; }
+            .p-2 { padding: 0.5rem; }
+            .p-3 { padding: 1rem; }
+            .pb-5 { padding-bottom: 3.5rem; }
+            .m-2 { margin: 0.5rem; }
+            .mt-1 { margin-top: 0.25rem; }
+            .mt-4- { margin-top: -4rem; }
+            .mt-2 { margin-top: 0.5rem; }
+            .fw-bold { font-weight: 700; }
+            .mb-3 { margin-bottom: 1rem; }
+            .fs-1 { font-size: 2.5rem; }
+            .fs-6 { font-size: 0.875rem; }
+            .id-card-photo img { object-fit: cover; }
+            .w-75 { width: 75%; }
+            .footer-line { height: 10px; }
+    
+            /* Body background */
+            body { font-family: Arial, sans-serif; }
+    
+            /* Container */
+            .id-card {
+                width: 350px;
+                height: 550px;
+                margin: 50px auto;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0,0,0,0.2);
+                border: 2px solid #5a2d82;
+                border-radius: 0.25rem;
+                overflow: hidden;
+            }
+
+            .id-card-photo img {
+                border: 15px double #5a2d82;
+            }
+
+            .py-1 {
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+            }
+
+            .my-3                                                                   {
+                margin-top: 0.75rem;
+                margin-bottom: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="id-card">
+            <div class="id-card-header text-white bg-color-purple text-center p-3 pb-5">
+                <img src="file:///D:/DotNetProjects/LMS/LMS.Presentation/wwwroot/assets/Images/Book_Icon.png" alt="Book Icon" width="52" height="38" />
+                <h3 class="mt-1">LIBRARY MANAGEMENT SYSTEM</h3>
+            </div>
+    
+            <div class="id-card-photo text-center mt-4-">
+                <img src="{{ProfilePhoto}}" width="140" height="170" alt="student-photo" />
+            </div>
+    
+            <div class="id-card-info text-center p-2">
+                <h2 class="color-purple fw-bold mt-2 mb-3">{{UserName}}</h2>
+                <p class="m-2 fs-6"><strong>ID NO.:</strong> {{LibraryCardNo}}</p>
+                <p class="m-2 fs-6"><strong>ISSUE DATE:</strong> {{JoiningDate}}</p>
+                <p class="m-2 fs-6"><strong>CONTACT NO.:</strong> {{PhoneNumber}}</p>
+            </div>
+    
+            <div class="id-card-barcode my-3 text-center">
+                <img class="w-75" src="{{Barcode}}" alt="barcode" />
+            </div>
+    
+            <div class="footer-line mt-2 bg-color-purple"></div>
+        </div>
+    </body>
+</html>

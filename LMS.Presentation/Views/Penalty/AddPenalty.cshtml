@@ -1,0 +1,299 @@
+﻿@model LMS.Application.Contracts.DTOs.Penalty.AddPenaltyDto
+
+@{
+    ViewData["Id"] = "addPenaltyModel";
+    ViewData["ModelTitle"] = "Add Penalty";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<style>
+    tr:has(.form-check-input:checked) {
+        background-color: #d5c8e14a;
+    }
+
+    @@media (min-width: 500px) {
+        .add-penalty-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/stepperform.js" asp-append-version="true"></script>
+
+<div class="progress mb-2" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-color-purple" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<form asp-action="AddPenalty" class="needs-validation" id="addPenaltyForm" method="post">
+    <i class="bi bi-arrow-left-circle bi-hover-bold cursor-pointer color-purple font-weight-bold position-absolute fs-2 action step-back"></i>
+
+    <div id="step1" class="card-body step">
+        <div class="text-center color-purple mb-4">
+            <h4 class="card-title font-weight-bold">Add Penalty info</h4>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 add-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-penalty-form-userId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.Users"
+                            asp-for="UserId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="UserId" class="did-floating-label">User<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 add-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-penalty-form-penaltyTypeId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.PenaltyTypeList"
+                            asp-for="PenaltyTypeId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="PenaltyTypeId" class="did-floating-label">Penalty Type<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="PenaltyTypeId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 add-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-penalty-form-statusId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.FineStatusList"
+                            asp-for="StatusId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="StatusId" class="did-floating-label">Status<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="StatusId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="my-2">
+            <div class="did-floating-label-content">
+                <textarea asp-for="Description" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+                <label asp-for="Description" class="did-floating-label">Penalty Description<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 add-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="Amount" type="number" class="did-floating-input" placeholder="" />
+                    <label asp-for="Amount" class="did-floating-label">Amount<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 add-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="OverDueDays" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                    <label asp-for="OverDueDays" class="did-floating-label">Overdue Days<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="OverDueDays" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="step2" class="card-body step" style="display: none;">
+        <div class="text-center mb-3">
+            <h4 class="card-title color-purple">Link Transaction</h4>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6 did-floating-label-content">
+                <input class="did-floating-input" id="disabled-userId" value="Please Select any user" placeholder="" />
+            </div>
+            <div class="col-md-4 gap-1">
+                <a class="btn btn-submit color-purple" id="transection-search-btn">Search</a>
+                <a class="btn btn-danger" id="clear-transection-btn">Clear selection</a>
+            </div>
+        </div>
+        <div class="text-center">
+            <div class="table-responsive scrollable-table" id="transactionTable">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="px-3">User</th>
+                            <th class="sortable-header" data-field="BookName">Book</th>
+                            <th class="sortable-header text-center" data-field="StatusLabel">Status</th>
+                            <th class="sortable-header text-center" data-field="HasPenalty">Has Penalty?</th>
+                            <th class="sortable-header text-center" data-field="BorrowDate">Borrow Date</th>
+                            <th class="sortable-header text-center" data-field="RenewDate">Renew Date</th>
+                            <th class="sortable-header text-center" data-field="DueDate">Due Date</th>
+                            <th class="sortable-header text-center" data-field="ReturnDate">Return Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="9" class="text-center border-0">No records found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <span asp-validation-for="TransectionId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-2 mb-2">
+        <button type="button" class="btn btn-submit w-100 action step-next">Next</button>
+        <button type="submit" class="btn btn-submit w-100 action submit" id="add-penalty-btn">Add Penalty</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#addPenaltyForm #add-penalty-form-userId');
+        removeSingleDropdownValueAttr('#addPenaltyForm #add-penalty-form-statusId');
+        removeSingleDropdownValueAttr('#addPenaltyForm #add-penalty-form-penaltyTypeId');
+
+        $('#addPenaltyForm #disabled-userId').prop('readonly', true);
+
+        if ($('#addPenaltyModel').length && $('#addPenaltyModel').is(':hidden'))
+        {
+            $('#addPenaltyModel').modal('show');
+        }
+
+        var selectedValue = $("#add-penalty-form-userId option:selected").text();
+        if (selectedValue === "")
+            selectedValue = "Please Select any user";
+
+        $('#disabled-userId').val(selectedValue);
+
+        $('#add-penalty-form-userId').on('change', function ()
+        {
+            var selectedValue = $("#add-penalty-form-userId option:selected").text();
+            if (selectedValue === "")
+                selectedValue = "Please Select any user";
+
+            $('#disabled-userId').val(selectedValue);
+        });
+
+        $("tr").off('click').on('click', function ()
+        {
+            $(this).find(".form-check-input.radio").prop("checked", true).trigger("change");
+        });
+
+        $("#clear-transection-btn").off('click').on('click', function ()
+        {
+            $(".form-check-input.radio:checked").prop("checked", false).trigger("change");
+        });
+
+        $('#transection-search-btn').off("click").on("click", function ()
+        {
+            event.preventDefault();
+            toggleButtonState('#transection-search-btn', true, 'color-purple btn-submit');
+
+            var userId = $('#add-penalty-form-userId').val();
+
+            $.ajax({
+                url: '@Url.Action("GetTransectionsByUser", "Transection")',
+                data: { user: userId },
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response)
+                {
+                    let tableBody = $("#transactionTable tbody");
+                    if (response && response.length > 0)
+                    {
+                        tableBody.empty();
+
+                        response.forEach(function (item)
+                        {
+                            let row = `
+                            <tr class="bg-color-default cursor-pointer">
+                                <td>
+                                    <input class="form-check-input radio" type="radio" name="TransectionId" value="${item.id}">
+                                </td>
+                                <td>
+                                    <img src="${item.userProfilePhoto}" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> ${item.userName}
+                                </td>
+                                <td>${item.bookName}</td>
+                                <td class="text-center">
+                                    <div class="status-clip dynamic-style"
+                                         style="--bgcolor:${item.statusLabelBgColor}; --textcolor:${item.statusLabelColor};">
+                                        ${item.statusLabel}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    ${item.hasPenalty ? '<i class="bi bi-check2 color-purple"></i>' : '<i class="bi bi-x-lg color-purple"></i>'}
+                                </td>
+                                <td class="text-center">${formatDate(item.borrowDate)}</td>
+                                <td class="text-center">${formatDate(item.renewDate)}</td>
+                                <td class="text-center">${formatDate(item.dueDate)}</td>
+                                <td class="text-center">${formatDate(item.returnDate)}</td>
+                            </tr>`;
+                            tableBody.append(row);
+                        });
+                    } else
+                    {
+                        tableBody.html('<tr><td colspan="9" class="text-center border-0">No records found</td></tr>');
+                    }
+                }
+            });
+            toggleButtonState('#transection-search-btn', false, 'color-purple btn-submit');
+        });
+    });
+
+    $("#transactionTable tbody").on("click", "tr", function ()
+    {
+        $(this).find(".form-check-input.radio").prop("checked", true).trigger("change");
+    });
+
+    $(document).off("submit", "#addPenaltyForm").on("submit", "#addPenaltyForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-penalty-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addPenaltyModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-penalty-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-penalty-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

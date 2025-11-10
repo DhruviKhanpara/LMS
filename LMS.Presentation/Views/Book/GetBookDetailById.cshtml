@@ -1,0 +1,135 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Books.GetBookDto
+
+@{
+    ViewData["Id"] = "getBookModal";
+    ViewData["ModelTitle"] = "Book Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+
+    var coverPage = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.CoverPage), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+
+    var bookPreview = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.BookPreview), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+}
+
+<style>
+    .img-thumbnail .bi {
+        font-size: 80px;
+    }
+
+    @@media (min-width: 500px) {
+        .detail-book-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+<div class="row mt-2">
+    <h3 class="color-purple">@Html.DisplayFor(model => model.Title)</h3>
+    <div class="description-container text-justify">
+        <span class="description color-gray">
+            @Html.DisplayFor(model => model.BookDescription)
+        </span>
+        <span class="toggle-more text-link color-purple">Read more</span>
+    </div>
+</div>
+<div class="row mt-2">
+    @if (coverPage is not null || bookPreview is not null)
+    {
+        <div class="col-md d-flex justify-content-center detail-book-form-col">
+            <div class="d-flex align-content-center flex-wrap justify-content-center gap-2">
+                @if (coverPage is not null)
+                {
+                    <img src="@coverPage.fileLocation" class="img-thumbnail" width="100" alt="Cover page" data-bs-toggle="tooltip" data-bs-placement="right" title="Cover page" onclick="showDocumentModal('@coverPage.fileLocation')" />
+                }
+                @if (bookPreview is not null)
+                {
+                    <div class="img-thumbnail" data-bs-toggle="tooltip" data-bs-placement="right" title="Book preview" onclick="showDocumentModal('@bookPreview.fileLocation')">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    <div class="col-md detail-book-form-col">
+        <div>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.GenreName)</b> : 
+                    @Html.DisplayFor(model => model.GenreName)
+                </li>
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.Isbn)</b> : 
+                    @Html.DisplayFor(model => model.Isbn)
+                </li>
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.Author)</b> : 
+                    @Html.DisplayFor(model => model.Author)
+                </li>
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.Publisher)</b> : 
+                    @Html.DisplayFor(model => model.Publisher)
+                </li>
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.PublishAt)</b> : 
+                    @Model.PublishAt?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                </li>
+                <li class="list-group-item status-field" style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+                    <b>@Html.DisplayNameFor(model => model.StatusLabel)</b> : 
+                    <span class="status-dot"></span>
+                    <span class="status-text">@Html.DisplayFor(model => model.StatusLabel)</span>
+                </li>
+                <li class="list-group-item">
+                    @Html.DisplayFor(model => model.AvailableCopies) <b>Available</b> / @Html.DisplayFor(model => model.TotalCopies) <b>Total copies</b>
+                </li>
+                <li class="list-group-item">
+                    <b>@Html.DisplayNameFor(model => model.Price)</b> : 
+                    @Html.DisplayFor(model => model.Price) <i class="fa fa-inr" aria-hidden="true"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row mt-2">
+    <h3 class="color-purple">About Author</h3>
+    <div class="description-container text-justify">
+        <span class="description">
+            @Html.DisplayFor(model => model.AuthorDescription)
+        </span>
+        <span class="toggle-more text-link color-purple">Read more</span>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getBookModal').length && $('#getBookModal').is(':hidden'))
+        {
+            $('#getBookModal').modal('show');
+        }
+
+        const maxDescriptionLength = 150;
+        $(".description-container").each(function ()
+        {
+            const $description = $(this).find(".description");
+            const $toggleButton = $(this).find(".toggle-more");
+
+            const fullDescription = $description.text().trim() || "";
+
+            initializeDescription($description, $toggleButton, fullDescription, maxDescriptionLength);
+        });
+    });
+
+    $('#transparentModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#getBookModal').css('z-index', 1051);
+    });
+
+    $('#transparentModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#getBookModal').css('z-index', 1050);
+    });
+</script>

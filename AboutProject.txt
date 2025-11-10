@@ -1,0 +1,205 @@
+﻿🎬 Updated Demo Script: Library Management System
+🟢 Introduction
+“Welcome to the demo of my Library Management System — a full-stack, enterprise-grade solution built with .NET Core MVC, SQL Server, Hangfire, Serilog, FluentValidation, and Onion Architecture. This system is designed to manage books, memberships, reservations, penalties, and more, with robust role-based access and automated background jobs.”
+
+🗄️ Database & Architecture Overview
+Show schema with granular entities like BookFileMapping, OutBoxMessages, Configs, and StatusType.
+
+Explain audit-ready logging: individual log tables per entity + system, communication, and exception logs.
+
+Mention triggers for every CRUD operation to ensure traceability.
+
+Highlight Onion Architecture for clean separation of concerns.
+
+🔐 Authentication & Role-Based Dashboards
+Login as Admin
+
+Show JWT token-based login.
+
+Navigate to Admin Dashboard.
+
+Highlight full access to all modules and historical views via log tables.
+
+Show deleted vs active data toggle.
+
+Display Hangfire job health dashboard with execution stats.
+
+Login as Librarian
+
+Show CRUD access to books, reservations, penalties, etc.
+
+Demonstrate penalty waiver flow.
+
+Point out limited visibility (no logs, no deleted data).
+
+Login as User
+
+Show card-based dashboard with personal reservations, penalties, and memberships.
+
+Display Instruction Page with rules and policies.
+
+Attempt an action with unpaid penalty to show restriction.
+
+📚 Book & Membership Management
+Admin adds a book
+
+Show FluentValidation in action.
+
+Upload cover image (required), optional preview PDF.
+
+Librarian edits book
+
+Use inline modal for editing.
+
+Save and show update reflected instantly.
+
+User views Discover Books
+
+Show card layout.
+
+Explain login requirement for full details.
+
+User purchases membership
+
+Show active and queued memberships (max 2).
+
+Explain buffer time and upgrade logic.
+
+📅 Reservation & Borrowing Flow
+User reserves a book
+
+Show reservation form and priority logic.
+
+Admin allocates reservation
+
+Explain 3-day pickup window (configurable).
+
+Show auto-cancellation and reallocation via Hangfire.
+
+User borrows a book
+
+Show available count decrement and status change.
+
+💸 Penalty System
+User misses return deadline
+
+Show penalty escalation (₹5/day → ₹10/day).
+
+Display penalty status as Unpaid.
+
+User dashboard access blocked
+
+Show enforcement of compliance.
+
+Librarian waives penalty
+
+Demonstrate waiver flow with reason.
+
+🧠 Background Jobs (Hangfire)
+Job Name	Frequency	Purpose
+Due Date Reminder	Daily (morning)	Notify users of upcoming returns
+Reservation Allocation	Daily	Assign books to top-priority reservations
+Expired Membership Cleanup	Daily	Remove outdated plans
+Penalty Calculation	Daily	Apply overdue penalties
+Allocation Reminder	Daily	Alert users of pending pickups
+Expired Allocation Reallocation	Daily	Reassign unclaimed reservations
+Email Dispatch	Every 5 minutes	Send notifications and alerts
+Show Hangfire dashboard with job health and execution metrics.
+
+Mention lightweight page refresh logic for real-time consistency.
+
+📊 Admin Dashboard & Logs
+View Charts (Chart.js)
+
+Show most borrowed books, overdue trends, membership stats.
+
+View Logs
+
+SystemLog, CommunicationLog, ExceptionLog.
+
+Filter by operation, user, date range.
+
+View Record History
+
+Open any entity → click “History” → show log entries.
+
+🖼️ UI/UX Highlights
+Table view for Admin/Librarian, card view for Users.
+
+Inline modals for editing — no full page reloads.
+
+Server-side pagination, sorting, and filtering — optimized for performance.
+
+🏁 Conclusion
+“This system demonstrates a scalable, secure, and user-friendly library management solution. With background automation, audit-ready logging, and role-based access, it’s ready for real-world deployment or further extension into mobile and API layers.”
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+I create a demo project Library management system with following features,
+
+- Database 
+ - Book, Genre, Membership, UserMembership, Penalty, Transections, Reservation, User, BookFileMapping, OutBoxMessages, RoleList, Status, PenaltyType, Configs, StatusType
+ - individual Log table for all the table, SystemLog Table, CommunicationLog Table, ExceptionLog table
+ - All table have trigger for add update and delete to add log to the log table about every single update in original table
+ - Have Hangfire Tables
+
+1) JWT token role based authentication - Admin, Librarian, User
+2) All the role have their own Deshboard based on the permitted content overview
+3) Admin-
+ - Have all data access - books, penalty, user membership plan, membership, check-outs, reservation, genre, configurations
+ - Can see the History of all data like all record have a option to see the history and it'll show the history from that log tables, and in the log table screen have a filter based on log type, operation performed by, start and end date
+ - for the user membership plan's reservation and borrow limit and start and expiration date update admin need user password if password correct then only this values will update else other change will save but this are not.
+ - For user password update Admin not need user's old password
+ - Admin can see the Hangfire Deshboard and also can see the job heath from the created page which include all jobs, status, last execuation date, next execution date, duration
+ - Admin can see the deleted and active data for all the screens
+
+Librarian -
+ - This user account have permission to add and edit the data in book, genre, membership, user membership plan, reservation, penalty, check-outs
+ - Librarian also have penalty for any reason which is create by the Admin and They can see their penalty from their Deshboard
+ - Librarian also can change reservation and borrow limits only from the user membership plan but need correct user password
+ - Librarian can update user password but need old password
+ - Librarian can see only active data not deleted oones and also not have access to see the logs
+
+User -
+ - User can see their own reservation, penalty, check-outs, active, next, last membership plan
+ - User can see the instruction page which include the rule which contains the borrow limit, reservation limit and from where this define, penalty rules, return policy, reservation policies etc..
+ - Can update their own profile, and password using their old password
+
+Access to all page -
+ - Home page define the basic info about the library
+ - membership plan have all the active membership plan list which user can purchase
+ - Discover book page for list all the books available in the library, only can see the book card list can't click to it and see all details for that need login.
+
+- Application flow
+ - If any new borrowing is happend in the book then according book's available book count will decrise by one and if it's still more then 0 the the status is Available else it became check-out
+ - If book status is Available then only can borrow the book
+ - If you borrow the book and lost it then you can claim to lost for that borrowing it'll add penalty for it same as the book price.
+ - If you reserve the book and it is available then it is assign to you if you are at the top prioriy, and priority is based on your allocation date and your allocate after date.
+ - once user get the allocation to their reservation then they can pick up book with in 3 days(define in config table) or can transfer the allocation to next user else after deadline their reservation is cancel automatic
+ - If allocation is done then also one book is decrise form the available book count and if after that available count became 0 then status for the book is reserverd.
+ - User can transfer the allocation for perticular number of times only (define in the config) after that need to cancel or pick-up else auto cancel is done
+ - For the check-out can do renew the book after defined deadline days (define in config 15 days from borrow day) if you don't return or renew after deadline penalty will applied to you
+ - define in config like initial 5Rs., Interval 5 days, method addition, update penalty by 5 Rs (for first 5 day per day 5Rs, next 5 day per day 10Rs)
+ - If user have penalty then Can't do anything from their deshboard first pay the penalty
+ - penalty can applied for - If membership is over and define buffer time is also over then add penalty per book - If new mwmbership is active and it's limit is less the perivious and you already have assessts as per last membership and buffer time is over then penalty on extra holding per each assest
+ - Librarian can Wived the penalty if they found any valid reason
+ - reservation status - reserved, allocated, fullfilled, cancel
+ - transection status - borrowed, renew, return, overdue, cancel, claimLoast
+ - penalty status - paid, unpaid, wived
+ - book status - available, loast-dameged, reserved, check-out, removed, onhold
+- When book is removed from the library then it's not available for new borrowing but for those who already have the book then staus became removed after collect all the book it will deleted, and this time if any reservation is there then it will automatically cancled.
+- User can download their library card
+
+- Duedate reminder, reservation allocation, removed expired user membership plan, allocation reminder, penalty calculate, expired allocation reallocation, email sending -- for this all have job which run mostly early in the morning email sending job run every 5 min
+
+- for all the book cover page is required, the perview pdf is not required but can add
+- User can purchase only one membership but can purchase one more which will start after expiring the current one but not more then 2 and next will strat after 5 min buffer this all limit define in the config
+- If have 2 membership and need to modify then and upgrad the memebrhsip but in this case last membership will upgrade if have 2 then
+- Duedate reminder, reservation allocation, removed expired user membership plan, allocation reminder, penalty calculate, expired allocation reallocation this all also add to the relative page to make the system with consistant data but this are already run at the morning so the time of the visit the page it take very less time like light weight
+- communication log contain the email sending logs and systemlog contain all the system information, watring kind of logs use serilog for this
+- Librarian and Admin have table view data while for user create a card view for batter view
+- for the Librarian and Admin - For edit and add create a model like open on the same page not new entire page loading
+- table have soring on the column, add the required filter on top of screen if required, add pagination also, pagination, soring from the database side not like load all data and just show the data based on the parameter
+
+
+I have this demo using .NET Core MVC, SQL server, Hangfire, Serilog, JQuery, Onion architechture, and add indexs in log table which table is use in UI for admin, use fluent validation, use chart.js for show the chart in deshboard

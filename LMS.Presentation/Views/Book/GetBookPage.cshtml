@@ -1,0 +1,310 @@
+﻿@using LMS.Core.Enums;
+@using LMS.Presentation.HTMLHelper;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Books.GetBookDto>
+
+@{
+    ViewData["Title"] = "GetBookPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool userLogin = User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.User));
+}
+
+<style>
+    body {
+        background-color: #f9f5ff;
+    }
+
+    .splide__pagination__page.is-active {
+        background: #8400db;
+    }
+
+    .letter-btn-group {
+        overflow-x: auto;
+    }
+</style>
+
+<link href="~/css/themes/light/bookcardview.css" rel="stylesheet" />
+
+@Html.Heading("Books Rack")
+<div class="container-fluid my-1">
+    <div class="btn-toolbar justify-content-center gap-4 mt-4 mb-3">
+        <div class="btn-group letter-btn-group" role="group" aria-label="First group">
+            <button type="button" data-filter="#" class="btn btn-submit letter-btn">#</button>
+            <button type="button" data-filter="A" class="btn btn-submit letter-btn">A</button>
+            <button type="button" data-filter="B" class="btn btn-submit letter-btn">B</button>
+            <button type="button" data-filter="C" class="btn btn-submit letter-btn">C</button>
+            <button type="button" data-filter="D" class="btn btn-submit letter-btn">D</button>
+            <button type="button" data-filter="E" class="btn btn-submit letter-btn">E</button>
+            <button type="button" data-filter="F" class="btn btn-submit letter-btn">F</button>
+            <button type="button" data-filter="G" class="btn btn-submit letter-btn">G</button>
+            <button type="button" data-filter="H" class="btn btn-submit letter-btn">H</button>
+            <button type="button" data-filter="I" class="btn btn-submit letter-btn">I</button>
+            <button type="button" data-filter="J" class="btn btn-submit letter-btn">J</button>
+            <button type="button" data-filter="K" class="btn btn-submit letter-btn">K</button>
+            <button type="button" data-filter="L" class="btn btn-submit letter-btn">L</button>
+            <button type="button" data-filter="M" class="btn btn-submit letter-btn">M</button>
+            <button type="button" data-filter="N" class="btn btn-submit letter-btn">N</button>
+            <button type="button" data-filter="O" class="btn btn-submit letter-btn">O</button>
+            <button type="button" data-filter="P" class="btn btn-submit letter-btn">P</button>
+            <button type="button" data-filter="Q" class="btn btn-submit letter-btn">Q</button>
+            <button type="button" data-filter="R" class="btn btn-submit letter-btn">R</button>
+            <button type="button" data-filter="S" class="btn btn-submit letter-btn">S</button>
+            <button type="button" data-filter="T" class="btn btn-submit letter-btn">T</button>
+            <button type="button" data-filter="U" class="btn btn-submit letter-btn">U</button>
+            <button type="button" data-filter="V" class="btn btn-submit letter-btn">V</button>
+            <button type="button" data-filter="W" class="btn btn-submit letter-btn">W</button>
+            <button type="button" data-filter="X" class="btn btn-submit letter-btn">X</button>
+            <button type="button" data-filter="Y" class="btn btn-submit letter-btn">Y</button>
+            <button type="button" data-filter="Z" class="btn btn-submit letter-btn">Z</button>
+        </div>
+        <div>
+            <div class="did-floating-label-content m-0">
+                <input class="did-floating-input" id="search-box" placeholder="" />
+                <label class="did-floating-label">Start with</label>
+            </div>
+        </div>
+    </div>
+
+    @if (userLogin)
+    {
+        <div class="pb-3 fs-5 d-flex justify-content-center align-content-center">
+            <a class="text-link color-purple" asp-area="" asp-controller="Configs" asp-action="GetIntructions">Check rules for Borrow/Reserve Book</a>
+        </div>
+    }
+
+    @if (Model.Data1.Any())
+    {
+        <div class="latest-content">
+            <div class="color-purple d-flex align-items-center">
+                <h2 class="mb-0 me-2">Latest Collections</h2>
+                <hr class="flex-grow-1" />
+            </div>
+            <div class="container-fluid my-2">
+                <div class="splide">
+                    <div class="splide__track align-items-center">
+                        <ul class="splide__list">
+                            @foreach (var item in Model.Data1)
+                            {
+                                <li class="splide__slide">
+                                    <div class="card p-2 border-0 bg-transparent">
+                                        <div class="row">
+                                            <div class="col-md-4 d-flex justify-content-center">
+                                                <a class="latest-book-img text-decoration-none" asp-area="" asp-controller="Book" asp-action="GetBookInfoById" data-book-id="@item.Id" data-bs-toggle="tooltip" data-bs-placement="right" title="Book info">
+                                                    <img alt="Book" src="@item.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.CoverPage), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault()?.fileLocation" width="130" height="200" />
+                                                </a>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h5 class="card-title color-purple">@item.Title</h5>
+                                                    <p class="card-text text-justify"><small class="text-muted limited-description">@Html.DisplayFor(modelItem => item.BookDescription)</small></p>
+                                                    <p class="card-text">- @Html.DisplayFor(modelItem => item.Author)</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="content">
+        <div class="color-purple d-flex align-items-center">
+            <h2 class="mb-0 me-2">Start with - <span id="letter-heading">A</span></h2>
+            <hr class="flex-grow-1" />
+            <div>
+                <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn prev" data-bs-toggle="tooltip" data-bs-placement="right" title="Previous">
+                    <i class="fa fa-angle-left fs-1 px-2" aria-hidden="true"></i>
+                </a>
+                <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn next" data-bs-toggle="tooltip" data-bs-placement="right" title="Next">
+                    <i class="fa fa-angle-right fs-1 px-2" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        @if (Model.Data.Any())
+        {
+            <div class="book-rack d-flex gap-4 flex-row flex-wrap mt-3 justify-content-center">
+                @foreach (var item in Model.Data)
+                {
+                    <a class="book-card text-decoration-none" asp-area="" asp-controller="Book" asp-action="GetBookInfoById" data-book-id="@item.Id">
+                        <div class="p-1">
+                            <img alt="Book" class="w-100 rounded-3" src="@item.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.CoverPage), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault()?.fileLocation" height="150" />
+                        </div>
+                        <div class="card-body p-0">
+                            <h6 class="color-purple limited-title" data-bs-toggle="tooltip" data-bs-placement="right" title="Book Name">@item.Title</h6>
+                            <span class="status-dot" style="--textcolor:@item.StatusLabelColor;" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.StatusLabel"></span>
+                            <small class="text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Author">@Html.DisplayFor(modelItem => item.Author)</small>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            await Html.RenderPartialAsync("_NotFoundPartial");
+        }
+    </div>
+</div>
+
+<div id="bookContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+<div id="imageModalContainer">
+    @Html.TransparentModal()
+</div>
+
+<script>
+    var splide = new Splide('.splide', {
+        type: 'loop',
+        perMove: 1,
+        drag: 'free',
+        autoplay: true,
+        breakpoints: {
+            590: {
+                perPage: 1,
+            },
+            767: {
+                perPage: 2,
+            },
+            850: {
+                perPage: 1,
+            },
+            992: {
+                perPage: 2,
+            },
+            1000: {
+                perPage: 1,
+            },
+            1350: {
+                perPage: 2,
+            },
+            10000: {
+                perPage: 3,
+            }
+        }
+    });
+
+    splide.mount();
+
+    $(document).ready(function ()
+    {
+        parseletterFromUrl();
+        updatePaginationBtnStatus();
+
+        $(".letter-btn").off("click").on("click", function ()
+        {
+            let filter = $(this).data("filter");
+            getFilteredBooks(filter);
+        });
+
+        let debounceTimer;
+        $('#search-box').on('input', function ()
+        {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() =>
+            {
+                let searchText = $(this).val();
+                getFilteredBooks(searchText);
+            }, 350);
+        });
+
+        $(".pagination-btn").off("click").on("click", function (e)
+        {
+            e.preventDefault();
+            let currentPage = @Model.Pagination.PageNumber;
+
+            if ($(this).hasClass("disabled")) return;
+            else if ($(this).hasClass("prev") && currentPage > 1) currentPage--;
+            else if ($(this).hasClass("next") && currentPage < @Model.Pagination.PageCount) currentPage++;
+
+            updatePaginationBtnStatus();
+            getFilteredBooks(undefined, currentPage);
+        });
+
+
+        const maxDescriptionLength = 150;
+        const maxTitleLength = 18;
+        $(".card-body").each(function ()
+        {
+            const $description = $(this).find(".limited-description");
+            const fullDescription = $description.text().trim() || "";
+
+            const $text = $(this).find(".limited-title");
+            const fullText = $text.text().trim() || "";
+
+            truncateText($description, fullDescription, maxDescriptionLength);
+            truncateText($text, fullText, maxTitleLength);
+        });
+
+        $('.book-rack .book-card, .latest-content .latest-book-img').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+
+            if ('@userLogin'.toLowerCase() == "true")
+            {
+                var bookId = $(this).data('book-id');
+                $.ajax({
+                    url: $(this).attr("href"),
+                    data: { id: bookId },
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (result)
+                    {
+                        $('#bookContainer').html(result);
+                    }
+                });
+            }
+            else
+            {
+                toastr.info("For get more information need User login", "Info");
+            }
+        });
+    });
+
+    function parseletterFromUrl()
+    {
+        const params = new URLSearchParams(window.location.search);
+        const nameStartWith = params.get("nameStartWith");
+        const letter = nameStartWith ? nameStartWith.charAt(0).toUpperCase() : "A";
+
+        if (nameStartWith)
+        {
+            $("#letter-heading").text(nameStartWith);
+            $("#search-box").val(nameStartWith);
+            $("#search-box").focus();
+        }
+
+        $(".letter-btn").removeClass("btn-submit-selected");
+        $(`.letter-btn[data-filter='${letter}']`).addClass("btn-submit-selected");
+    }
+
+    function updatePaginationBtnStatus()
+    {
+        $(".pagination-btn").removeClass("btn-submit-disabled");
+        $(".pagination-btn").removeClass("btn-submit-disabled-border");
+        if (@Model.Pagination.PageNumber === 1)
+            toggleButtonState('.pagination-btn.prev', true, 'bg-color-purple text-light');
+
+        if (@Model.Pagination.PageNumber === @Model.Pagination.PageCount)
+            toggleButtonState('.pagination-btn.next', true, 'bg-color-purple text-light');
+    }
+
+    function getFilteredBooks(letter, pageNumber)
+    {
+        let currentUrl = window.location.href;
+        const url = new URL(currentUrl);
+
+        if (letter !== undefined)
+            url.searchParams.set("nameStartWith", letter);
+        if (pageNumber !== undefined)
+            url.searchParams.set("pageNumber", pageNumber);
+        
+        if (letter !== undefined || pageNumber !== undefined)
+            window.location.href = url;
+    }
+</script>

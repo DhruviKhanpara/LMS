@@ -1,0 +1,133 @@
+﻿@model LMS.Application.Contracts.DTOs.Configs.UpdateConfigsDto
+
+@{
+    ViewData["Id"] = "updateConfigsModel";
+    ViewData["ModelTitle"] = "Update Config";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<form asp-action="UpdateConfig" class="needs-validation" id="updateConfigsForm" method="post">
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="KeyName" class="did-floating-input keyname" placeholder="" />
+            <label asp-for="KeyName" class="did-floating-label">Key Name<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="KeyName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="KeyValue" class="did-floating-input" placeholder="" />
+            <label asp-for="KeyValue" class="did-floating-label">Key Value<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="KeyValue" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="Description" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="Description" class="did-floating-label">Config Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6 update-config-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-config-form-createBy"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.CreateUserList"
+                        asp-for="CreatedBy"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="CreatedBy" class="did-floating-label">Create By</label>
+                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6 update-config-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-config-form-modifyBy"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.ModifiedUserList"
+                        asp-for="ModifiedBy"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="ModifiedBy" class="did-floating-label">Modify By</label>
+                <span asp-validation-for="ModifiedBy" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="my-2" id="warning">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+        <span class="text-danger">When changing any configuration value, exercise caution as it may affect how the system functions.</span>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="update-config-btn">Update Config</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        readonlyField(".keyname");
+        removeSingleDropdownValueAttr('#updateConfigsForm #update-config-form-createBy');
+        removeSingleDropdownValueAttr('#updateConfigsForm #update-config-form-modifyBy');
+
+        readonlySelect2('#updateConfigsForm #update-config-form-createBy, #updateConfigsForm #update-config-form-modifyBy');
+
+        if ($('#updateConfigsModel').length && $('#updateConfigsModel').is(':hidden'))
+        {
+            $('#updateConfigsModel').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#updateConfigsForm").on("submit", "#updateConfigsForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-config-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updateConfigsModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-config-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-config-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

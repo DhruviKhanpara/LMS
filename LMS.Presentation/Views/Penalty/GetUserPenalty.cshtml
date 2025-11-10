@@ -1,0 +1,285 @@
+﻿@using LMS.Presentation.HTMLHelper;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Penalty.GetPenaltyDto>
+
+@{
+    ViewData["Title"] = "GetUserPenalty";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Heading("My Penalty Section")
+<div class="content">
+    <div class="mt-3 fs-5 d-flex justify-content-center align-content-center">
+        <a class="text-link color-purple" asp-area="" asp-controller="Configs" asp-action="GetIntructions">Check rules for Penalty</a>
+    </div>
+
+    @if (Model.Data.Any() || Model.Data1.Any())
+    {
+        @if (Model.Data.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Un-paid Penalty</h3>
+                <hr class="flex-grow-1" />
+            </div>
+            <div class="user-penalty-section table-responsive scrollable-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Penalty Type</th>
+                            <th>Penalty Type Info</th>
+                            <th>Notes</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">OverDue Days</th>
+                            <th class="text-center">Transaction Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Data)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex justify-content-between gap-1 penalty-details-table">
+                                        <a class="color-purple bi-hover-bold penalty-actionById-btn" 
+                                            asp-area=""
+                                            asp-controller="Transection" 
+                                            asp-action="GetTransectionDetailById" 
+                                            data-id="@item.TransectionId"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            title="Linked Transaction">
+                                        <i class="bi bi-link-45deg"></i></a>
+
+                                        <a class="color-purple bi-hover-bold penalty-actionById-btn payment-link" 
+                                            asp-area="" 
+                                            asp-controller=""
+                                            asp-action=""
+                                            data-id="@item.Id" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="right"
+                                            title="Pay">
+                                        <i class="bi bi-credit-card"></i></a>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="status-clip px-2 @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                        @Html.DisplayFor(modelItem => item.StatusLabel)
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayFor(modelItem => item.PenaltyTypeName)
+                                </td>
+                                <td class="truncate-description-container" data-max-length="50" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.PenaltyTypeInfo">
+                                    @Html.DisplayFor(modelItem => item.PenaltyTypeInfo)
+                                </td>
+                                <td class="truncate-description-container" data-max-length="50" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.Description">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayFor(modelItem => item.Amount) <i class="fa fa-inr" aria-hidden="true"></i>
+                                </td>
+                                <td class="text-center">
+                                    @(item.OverDueDays != null ? $"{item.OverDueDays} Days" : "-")
+                                </td>
+                                <td class="text-center">
+                                    @(item.TransectionDueDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (Model.Data1.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Past Penalty</h3>
+                <hr class="flex-grow-1" />
+                <div>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn prev" data-bs-toggle="tooltip" data-bs-placement="right" title="Previous">
+                        <i class="fa fa-angle-left fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn next" data-bs-toggle="tooltip" data-bs-placement="right" title="Next">
+                        <i class="fa fa-angle-right fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="user-penalty-section table-responsive scrollable-table">
+                <table class="table penalty-details-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Penalty Type</th>
+                            <th>Penalty Type Info</th>
+                            <th>Notes</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">OverDue Days</th>
+                            <th class="text-center">Transaction Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Data1)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex justify-content-between gap-1 penalty-details-table">
+                                        <a class="color-purple bi-hover-bold penalty-actionById-btn linked-transection" 
+                                            asp-area=""
+                                            asp-controller="Transection" 
+                                            asp-action="GetTransectionDetailById" 
+                                            data-id="@item.TransectionId" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="right"
+                                            title="Linked Transaction">
+                                        <i class="bi bi-link-45deg"></i></a>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="status-clip px-2 @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                        @Html.DisplayFor(modelItem => item.StatusLabel)
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayFor(modelItem => item.PenaltyTypeName)
+                                </td>
+                                <td class="truncate-description-container" data-max-length="50" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.PenaltyTypeInfo">
+                                    @Html.DisplayFor(modelItem => item.PenaltyTypeInfo)
+                                </td>
+                                <td class="truncate-description-container" data-max-length="150" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.Description">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayFor(modelItem => item.Amount) <i class="fa fa-inr" aria-hidden="true"></i>
+                                </td>
+                                <td class="text-center">
+                                    @(item.OverDueDays != null ? $"{item.OverDueDays} Days" : "-")
+                                </td>
+                                <td class="text-center">
+                                    @(item.TransectionDueDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_NotFoundPartial");
+    }
+</div>
+<div id="penaltyContainer"></div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
+
+        if (successToastMessage)
+        {
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
+        }
+
+        updatePaginationBtnStatus();
+
+        $(".linked-transection").each(function ()
+        {
+            var id = $(this).data("id");
+
+            if (id == 0 || id == undefined)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to any transection is not linked")
+                    .removeAttr("data-id");
+            }
+        });
+
+        $('.penalty-details-table .penalty-actionById-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            var id = $(this).data('id');
+
+            if ($(this).hasClass('payment-link'))
+            {
+                toastr.info("Please connect to the Librarian / Admin till online payment is not accepted", "Info");
+                id = undefined;
+            }
+
+            if (id !== undefined)
+            {
+                $.ajax({
+                    url: $(this).attr("href"),
+                    data: { id: id },
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (response, status, xhr)
+                    {
+                        var contentType = xhr.getResponseHeader("content-type").toLowerCase();
+                        
+                        if (contentType.includes("application/json"))
+                        {
+                            if (!response.success)
+                            {
+                                window.location.href = response.visit;
+                            }
+                        } else if (contentType.includes("text/html"))
+                        {
+                            $('#penaltyContainer').html(response);
+                        }
+                    }
+                });
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+
+        $(".pagination-btn").off("click").on("click", function (e)
+        {
+            e.preventDefault();
+            let currentPage = @Model.Pagination.PageNumber;
+
+            if ($(this).hasClass("disabled")) return;
+            else if ($(this).hasClass("prev") && currentPage > 1) currentPage--;
+            else if ($(this).hasClass("next") && currentPage < @Model.Pagination.PageCount) currentPage++;
+
+            updatePaginationBtnStatus();
+            callApiWithFilter(currentPage);
+        });
+    });
+
+    function updatePaginationBtnStatus()
+    {
+        $(".pagination-btn").removeClass("btn-submit-disabled");
+        $(".pagination-btn").removeClass("btn-submit-disabled-border");
+        if (@Model.Pagination.PageNumber === 1)
+            toggleButtonState('.pagination-btn.prev', true, 'bg-color-purple text-light');
+
+        if (@Model.Pagination.PageNumber === @Model.Pagination.PageCount)
+            toggleButtonState('.pagination-btn.next', true, 'bg-color-purple text-light');
+    }
+
+    function callApiWithFilter(pageNumber)
+    {
+        let currentUrl = window.location.href;
+        const url = new URL(currentUrl);
+
+        url.searchParams.set("pageNumber", pageNumber);
+        
+        if (pageNumber !== undefined)
+            window.location.href = url;
+    }
+</script>

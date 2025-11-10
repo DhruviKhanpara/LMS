@@ -1,0 +1,125 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+@inject IHttpContextAccessor httpContextAccessor;
+
+<link rel="stylesheet" href="~/css/themes/light/_sidebarpartial.css" asp-append-version="true" />
+
+<div class="sidebar bg-dark text-white d-flex flex-column flex-shrink-0 p-3">
+    <div class="sidebar-heading">
+        <a class="d-flex align-items-center justify-content-center mb-3 mb-md-0 text-white text-decoration-none sidebar-title" asp-area="" asp-controller="Home" asp-action="Index">
+            <span class="fs-4">LMS</span>
+        </a>
+        <hr class="mt-1 sidebar-hr">
+    </div>
+
+    <div class="sidebar-menu flex-grow-1">
+        <ul class="nav nav-pills flex-column mb-auto">
+            @if (User.Identity.IsAuthenticated)
+            {
+                @if (User.IsInRole(nameof(RoleListEnum.Librarian)) || User.IsInRole(nameof(RoleListEnum.Admin)))
+                {
+                    @if (User.IsInRole(nameof(RoleListEnum.Librarian)))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="LibrarianDashboard" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-option-text"> Dashboard</span></a>
+                        </li>
+                    }
+                    else if (User.IsInRole(nameof(RoleListEnum.Admin)))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="AdminDashboard" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-option-text"> Dashboard</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/hangfire" target="_blank" data-bs-toggle="tooltip" data-bs-placement="right" title="Hangfire Dashboard"><i class="bi bi-stack"></i><span class="sidebar-option-text"> Hangfire Dashboard</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="GetDetailedJobHealth" data-bs-toggle="tooltip" data-bs-placement="right" title="Job health check"><i class="bi bi-heart-pulse"></i><span class="sidebar-option-text"> Job Heath</span></a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Book" asp-action="GetBooks" data-bs-toggle="tooltip" data-bs-placement="right" title="Books"><i class="bi bi-book"></i><span class="sidebar-option-text"> Books</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Genre" asp-action="GetGenres" data-bs-toggle="tooltip" data-bs-placement="right" title="Genre"><i class="bi bi-columns-gap"></i><span class="sidebar-option-text"> Genre</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Transection" asp-action="GetTransections" data-bs-toggle="tooltip" data-bs-placement="right" title="Check-out Books"><i class="bi bi-bag-plus"></i><span class="sidebar-option-text"> Check-out Books</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Reservation" asp-action="GetReservations" data-bs-toggle="tooltip" data-bs-placement="right" title="Reservations"><i class="bi bi-calendar-event"></i><span class="sidebar-option-text"> Reservations</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Penalty" asp-action="GetPenalty" data-bs-toggle="tooltip" data-bs-placement="right" title="Penalty"><i class="bi bi-exclamation-circle"></i><span class="sidebar-option-text"> Penalty</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Membership" asp-action="GetMemberships" data-bs-toggle="tooltip" data-bs-placement="right" title="Membership"><i class="bi bi-tags"></i><span class="sidebar-option-text"> Membership</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="UserMembershipMapping" asp-action="GetUserMemberships" data-bs-toggle="tooltip" data-bs-placement="right" title="User's Plan"><i class="bi bi-file-earmark-person"></i><span class="sidebar-option-text"> User's Plan</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="GetUsers" data-bs-toggle="tooltip" data-bs-placement="right" title="Users"><i class="bi bi-people"></i><span class="sidebar-option-text"> Users</span></a>
+                    </li>
+                    @if (User.IsInRole(nameof(RoleListEnum.Admin)))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Configs" asp-action="GetConfigs" data-bs-toggle="tooltip" data-bs-placement="right" title="Configurations"><i class="bi bi-gear-fill"></i><span class="sidebar-option-text"> Configurations</span></a>
+                        </li>
+                        <li class="nav-item has-submenu">
+                            <div class="d-flex justify-content-between align-items-center menu-title">
+                                <a href="#" class="nav-link text-white"><i class="bi bi-journal-text"></i><span class="sidebar-option-text"> Logs</span></a>
+                                <i class="bi bi-caret-right-fill pe-2"></i>
+                            </div>
+                            <ul class="nav submenu bg-dark text-white">
+                                <li><a class="nav-link text-white" asp-area="" asp-controller="Log" asp-action="GetBooksAuditHistory" data-bs-toggle="tooltip" data-bs-placement="right" title="Book History"><i class="bi bi-file-earmark-text"></i><span> Book History</span></a></li>
+                                <li><a class="nav-link text-white" asp-area="" asp-controller="Log" asp-action="GetGenresAuditHistory" data-bs-toggle="tooltip" data-bs-placement="right" title="Genre History"><i class="bi bi-file-earmark-text"></i><span> Genre History</span></a></li>
+                                <li><a class="nav-link text-white" asp-area="" asp-controller="Log" asp-action="GetMembershipsAuditHistory" data-bs-toggle="tooltip" data-bs-placement="right" title="Membership History"><i class="bi bi-file-earmark-text"></i><span> Membership History</span></a></li>
+                                <li><a class="nav-link text-white" asp-area="" asp-controller="Log" asp-action="GetUsersAuditHistory" data-bs-toggle="tooltip" data-bs-placement="right" title="User History"><i class="bi bi-file-earmark-text"></i><span> User History</span></a></li>
+                                <li><a class="nav-link text-white" asp-area="" asp-controller="Log" asp-action="GetConfigsAuditHistory" data-bs-toggle="tooltip" data-bs-placement="right" title="Configuration History"><i class="bi bi-file-earmark-text"></i><span> Configuration History</span></a></li>
+                            </ul>
+                        </li>
+                    }
+                }
+                else if (User.IsInRole(nameof(RoleListEnum.User)))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="UserDashboard" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-option-text"> Dashboard</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Book" asp-action="GetBookPage" data-bs-toggle="tooltip" data-bs-placement="right" title="Discover"><i class="bi bi-book"></i><span class="sidebar-option-text"> Discover</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Transection" asp-action="GetUserTransections" data-bs-toggle="tooltip" data-bs-placement="right" title="Check-out Books"><i class="bi bi-bag-plus"></i><span class="sidebar-option-text"> Check-out Books</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Reservation" asp-action="GetUserReservations" data-bs-toggle="tooltip" data-bs-placement="right" title="Reservations"><i class="bi bi-calendar-event"></i><span class="sidebar-option-text"> Reservations</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Penalty" asp-action="GetUserPenalty" data-bs-toggle="tooltip" data-bs-placement="right" title="My Penalty"><i class="bi bi-exclamation-circle"></i><span class="sidebar-option-text"> My Penalty</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="UserMembershipMapping" asp-action="GetLoginUserMembership" data-bs-toggle="tooltip" data-bs-placement="right" title="My Memberships"><i class="bi bi-gem"></i><span class="sidebar-option-text"> My Memberships</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Configs" asp-action="GetIntructions" data-bs-toggle="tooltip" data-bs-placement="right" title="Instructions"><i class="bi bi-journals"></i><span class="sidebar-option-text"> Instructions</span></a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="sidebar-footer mt-auto">
+        <hr class="sidebar-hr">
+
+        <div class="dropdown">
+            @Html.ProfileCard(httpContextAccessor)
+
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="profile-menu">
+                <li><a class="dropdown-item" asp-area="" asp-controller="User" asp-action="GetUserProfile">Profile</a></li>
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><hr class="my-2" /></li>
+                <li><a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

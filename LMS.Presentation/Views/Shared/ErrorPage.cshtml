@@ -1,0 +1,58 @@
+﻿@model ErrorViewModel
+
+@{
+    ViewData["Title"] = "ErrorPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>    
+    .error-image img {
+        max-width: 350px;
+    }
+    
+    .error-text p {
+        max-width: 500px;
+        line-height: 1.6;
+    }
+    
+    @@media (max-width: 510px) {
+        .error-container {
+            flex-direction: column;
+            text-align: center;
+        }
+    
+        .error-image img {
+            max-width: 250px;
+        }
+    }
+</style>
+
+<div class="error-container d-flex align-items-center justify-content-center gap-2">
+    <div class="error-image">
+        <img class="w-100 h-auto" src="~/assets/Images/Error_Page_Image.png" alt="Sad Character For your error">
+    </div>
+    <div class="error-text">
+        <h1 class="color-purple fw-bolder mb-3">Awww... Don't Cry.</h1>
+        <p class="color-gray">
+            It's just a <span class="color-purple fw-bolder">@Model.StatusCode</span> Error!<br>
+            @Model.ErrorMessage
+        </p>
+        <div>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                @if (Model.StatusCode != 401 && Model.StatusCode != 403)
+                {
+                    <a class="btn btn-submit color-purple" asp-area="" asp-controller="Home" asp-action="Index">Back to home!!</a>
+                }
+                else
+                {
+                    <a class="btn btn-submit color-purple" asp-area="" asp-controller="User" asp-action="Login">Go for Login</a>
+                }
+            }
+            else
+            {
+                <a class="btn btn-submit color-purple" asp-area="" asp-controller="Home" asp-action="Index">Let's Back!!</a>
+            }
+        </div>
+    </div>
+</div>

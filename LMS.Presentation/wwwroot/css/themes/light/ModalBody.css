@@ -1,0 +1,48 @@
+﻿@media (max-width: 628px) {
+    .model-body-pricing-cards {
+        flex-direction: row !important;
+    }
+    .model-body-pricing-operation {
+        flex-direction: row !important;
+    }
+    .model-body-pricing-operation img {
+        transform: rotateX(180deg) rotate(90deg);
+    }
+    .model-body-card-heading {
+        display: block !important;
+    }
+    .modal-body-custom {
+        flex-direction: column !important;
+    }
+ }
+
+@media (max-width: 530px) {
+    .model-body-pricing-cards {
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 475px) {
+    .model-body-pricing-operation {
+        flex-direction: row !important;
+    }
+    .model-body-pricing-operation img {
+        transform: rotateX(180deg) rotate(90deg);
+    }
+    .model-body-card-heading {
+        display: block !important;
+    }
+    .modal-body-custom {
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 371px) {
+    .model-body-pricing-cards {
+        flex-direction: column !important;
+        align-items: normal !important;
+    }
+    .model-body-pricing-operation img {
+        width: 55px !important;
+    }
+}

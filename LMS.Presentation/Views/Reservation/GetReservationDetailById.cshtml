@@ -1,0 +1,71 @@
+﻿@model LMS.Application.Contracts.DTOs.Reservation.GetReservationDto
+
+@{
+    ViewData["Id"] = "getReservationModal";
+    ViewData["ModelTitle"] = "Reservation Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.UserName)</b> : 
+            <img src="@Model.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(model => model.UserName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.BookName)</b> : 
+            @Html.DisplayFor(model => model.BookName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.ReservationDate)</b> : 
+            @Model.ReservationDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.AllocateAfter)</b> : 
+            @Model.AllocateAfter.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item status-field" style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+            <b>@Html.DisplayNameFor(model => model.StatusLabel)</b> :
+            <span class="status-dot"></span>
+            <span class="status-text">@Html.DisplayFor(model => model.StatusLabel)</span>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.IsAllocated)</b> : 
+            @if (Model.IsAllocated == true)
+            {
+                <i class="bi bi-check2 color-purple"></i> @: ( Yes )
+            }
+            else
+            {
+                <i class="bi bi-x-lg color-purple"></i> @: ( No )
+            }
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.AllocatedAt)</b> : 
+            @(Model.AllocatedAt?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.TransferAllocationCount)</b> :
+            @Html.DisplayFor(model => model.TransferAllocationCount)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.CancelDate)</b> :
+            @(Model.CancelDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.CancelReason)</b> : 
+            @(Model.CancelReason != null ? Html.DisplayFor(model => model.CancelReason) : "-")
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getReservationModal').length && $('#getReservationModal').is(':hidden'))
+        {
+            $('#getReservationModal').modal('show');
+        }
+    });
+</script>

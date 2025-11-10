@@ -1,0 +1,336 @@
+html {
+    font-size: 14px;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    border-color: #5a2d82c4;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #5a2d8296;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #5a2d82;
+    background-color: #5a2d8229;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .125);
+}
+
+.accordion-button:focus {
+    border-color: #5a2d82;
+    /*box-shadow: 0 0 0 .25rem #5a2d8229;*/
+    box-shadow: none;
+}
+
+.form-check-input:checked {
+    background-color: #5a2d82;
+    border-color: #5a2d82;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+    scrollbar-width: thin;
+}
+
+body {
+  /*margin-bottom: 60px;*/
+}
+
+textarea {
+    resize: none;
+}
+
+.btn-submit {
+    background-color: transparent;
+    border: 1px solid #5a2d82;
+    font-weight: 500;
+    transition: 0.2s ease-in-out;
+    color: #5a2d82;
+}
+
+.btn-submit:hover, .btn-submit.btn-submit-selected {
+    background-color: #5a2d82;
+    color: white;
+}
+
+.btn-submit-disabled, .btn-submit-disabled:hover {
+    color: gray;
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.btn-submit-disabled-border, .btn-submit-disabled-border:hover {
+    border: 1px solid gray;
+}
+
+label {
+    color: #6d1d76;
+}
+
+.text-link {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:focus {
+    outline: 0;
+}
+
+.toggle {
+    height: 32px;
+    width: 52px;
+    border-radius: 16px;
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    border: 2px solid #474755;
+    background: linear-gradient(180deg, #2D2F39 0%, #1F2027 100%);
+    transition: all 0.2s ease;
+}
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2);
+    transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
+}
+
+input[type="checkbox"]:checked + .toggle {
+    border-color: #5a2d82;
+}
+
+input[type="checkbox"]:checked + .toggle::after {
+    transform: translateX(20px);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.scrollable-table {
+    max-height: 60vh;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    scrollbar-width: thin;
+    border-radius: 5px 5px 0 0;
+}
+
+.scrollable-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #d5c8e1;
+    cursor: pointer;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    white-space: nowrap;
+}
+
+.table tr {
+    display: table-row;
+}
+
+.scrollable-table tbody {
+    cursor: default;
+}
+
+.scrollable-table tbody tr.bg-color-default:hover {
+    background-color: #f7f7f7;
+}
+
+.scrollable-table tbody tr.bg-color-danger:hover {
+    background-color: #ff000014;
+}
+
+.status-clip {
+    border-radius: 5px;
+    padding: 2px 10px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--textcolor, #6c757d29) !important;
+    background-color: var(--bgcolor, #6c757d) !important;
+}
+
+.status-clip .default-style {
+    color: #6c757d29 !important;
+    background-color: #6c757d !important;
+}
+
+.status-field {
+    background-color: var(--bgcolor, #6c757d29) !important;
+}
+
+.status-dot {
+    border-radius: 50%;
+    padding: 5px;
+    display: inline-block;
+    background-color: var(--textcolor, #6c757d);
+}
+
+.status-text {
+    color: var(--textcolor, #6c757d29);
+    font-weight: 500;
+}
+
+.bi-hover-bold:hover {
+    animation: icon-color-animation 1s ease-in-out infinite;
+}
+
+.image-preview {
+    position: relative;
+    display: inline-block;
+}
+
+.file-container {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.remove-file {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 1px 4px;
+    font-size: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.remove-file:hover {
+    background: darkred;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    flex: 1;
+    padding-right: 2.5rem;
+}
+
+.password-container .togglePassword {
+    position: absolute;
+    right: 0.5rem;
+    cursor: pointer;
+    color: #777;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.password-container:hover .togglePassword,
+.password-container input:focus ~ .togglePassword {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-container .togglePassword:hover {
+    color: #5a2d82;
+}
+
+.color-purple {
+    color: #5a2d82;
+}
+
+.bg-color-purple {
+    background-color: #5a2d82;
+}
+
+.color-green {
+    color: green;
+}
+
+.color-gray {
+    color: #afafaf !important;
+}
+
+.bg-color-gray {
+    background-color: #afafaf !important;
+}
+
+.bg-color-light-gray {
+    background-color: #e9e9e98f !important;
+}
+
+.bg-color-danger {
+    background-color: #ff000021 !important;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.container-fit-content {
+    max-width: fit-content;
+}
+
+.height-fit-content {
+    height: fit-content;
+}
+
+.w-15 {
+    width: 200px !important;
+}
+
+.rounded-4 {
+    border-radius: 0.8rem !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+@keyframes icon-color-animation
+{
+    0% { color: #ecb8ff; }
+    25% { color: #9671a3; }
+    50% { color: #7d0be3; }
+    75% { color: #9671a3; }
+    100% { color: #ecb8ff; }
+}

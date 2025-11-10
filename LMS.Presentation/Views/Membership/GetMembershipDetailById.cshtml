@@ -1,0 +1,56 @@
+﻿@model LMS.Application.Contracts.DTOs.Membership.GetMembershipDto
+
+@{
+    ViewData["Id"] = "getMembershipModal";
+    ViewData["ModelTitle"] = "Membership Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Type)</b> :
+            @Html.DisplayFor(model => model.Type)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Description)</b> :
+            @Html.DisplayFor(model => model.Description)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.BorrowLimit)</b> :
+            @Html.DisplayFor(model => model.BorrowLimit) can hold at a time
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.ReservationLimit)</b> :
+            @Html.DisplayFor(model => model.ReservationLimit) at a time
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Duration)</b> :
+            @Html.DisplayFor(model => model.Duration) Days
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Cost)</b> :
+            @Html.DisplayFor(model => model.Cost) <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Discount)</b> :
+            @Html.DisplayFor(model => model.Discount) <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+        <li class="list-group-item">
+            <b>Net Cost</b> :
+            <span class="color-purple">@(Model.Cost - Model.Discount) <i class="fa fa-inr" aria-hidden="true"></i></span>
+        </li>
+    </ul>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getMembershipModal').length && $('#getMembershipModal').is(':hidden'))
+        {
+            $('#getMembershipModal').modal('show');
+        }
+    });
+</script>

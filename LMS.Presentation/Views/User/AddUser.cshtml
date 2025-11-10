@@ -1,0 +1,229 @@
+﻿@using LMS.Core.Enums;
+@using LMS.Common.Helpers;
+@inject IHttpContextAccessor httpContextAccessor;
+
+@model LMS.Application.Contracts.DTOs.User.RegisterUserDto
+
+@{
+    ViewData["Id"] = "addUserModel";
+    ViewData["ModelTitle"] = "Add Account";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+
+    var isLibrarian = httpContextAccessor.HttpContext!.GetUserRole() == nameof(RoleListEnum.Librarian);
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .add-user-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+<form asp-action="AddUser" class="needs-validation" id="addUserForm" method="post" enctype="multipart/form-data">
+    <div class="row mt-2">
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="FirstName" type="text" class="did-floating-input" placeholder="" />
+                <label asp-for="FirstName" class="did-floating-label">First Name<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="MiddleName" type="text" class="did-floating-input" placeholder="" />
+                <label asp-for="MiddleName" class="did-floating-label">Middle Name</label>
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="LastName" type="text" class="did-floating-input" placeholder="" />
+                <label asp-for="LastName" class="did-floating-label">Last Name<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="Address" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="Address" class="did-floating-label">Address<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Email" type="email" class="did-floating-input" placeholder="" />
+                <label asp-for="Email" class="did-floating-label">Email<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Dob" type="datetime-local" max='@DateTime.UtcNow.AddYears(-3).ToString("yyyy-MM-dd")' class="did-floating-input" placeholder="" />
+                <label asp-for="Dob" class="did-floating-label">Date of Birth<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Dob" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md add-user-col">
+            <label asp-for="MobileNo" class="control-label">Mobile Number<sup class="text-danger">*</sup></label>
+            <div class="input-group">
+                <span class="input-group-text" id="prependMobileNumber">+91</span>
+                <input asp-for="MobileNo" type="tel" class="form-control rounded-end" aria-describedby="prependMobileNumber" placeholder="Mobile Number" />
+            </div>
+            <span asp-validation-for="MobileNo" class="text-danger"></span>
+        </div>
+        <div class="col-md add-user-col">
+            <label asp-for="Gender" class="control-label">Gender<sup class="text-danger">*</sup></label>
+            <div class="form-control d-flex flex-row justify-content-evenly">
+                <input asp-for="Gender" type="radio" id="male" name="Gender" value="Male"> Male
+                <input asp-for="Gender" type="radio" id="female" name="Gender" value="Female"> Female
+                <input asp-for="Gender" type="radio" id="notSaid" name="Gender" value="NotSaid"> Not to say
+            </div>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row my-2">
+        <div class="col-md add-user-col">
+            <div class="mb-2">
+                <label asp-for="ProfilePhoto" class="control-label">Profile Photo</label>
+                <input asp-for="ProfilePhoto" type="file" accept=".jpg, .jpeg, .png" class="form-control" />
+                <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+            </div>
+            <div class="file-preview mb-2"></div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Username" type="text" class="did-floating-input" placeholder="" />
+                <label asp-for="Username" class="did-floating-label">Username<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <div class="password-container">
+                    <input asp-for="Password" class="did-floating-input" type="password" placeholder="">
+                    <label asp-for="Password" class="did-floating-label">Password<sup class="text-danger">*</sup></label>
+                    <span class="togglePassword" onmousedown="passwordVisibilityStart(this)" onmouseup="passwordVisibilityEnd(this)">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-user-col">
+            <div class="did-floating-label-content">
+                <div class="password-container">
+                    <input asp-for="ConfirmPassword" class="did-floating-input" type="password" placeholder="">
+                    <label asp-for="ConfirmPassword" class="did-floating-label">Confirm Password<sup class="text-danger">*</sup></label>
+                    <span class="togglePassword" onmousedown="passwordVisibilityStart(this)" onmouseup="passwordVisibilityEnd(this)">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-4 add-user-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-user-form-roleId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.RoleList"
+                            asp-for="RoleId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="RoleId" class="did-floating-label">Role<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 add-user-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="JoiningDate" type="datetime-local" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' class="did-floating-input" placeholder="" />
+                    <label asp-for="JoiningDate" class="did-floating-label">Joining Date<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="JoiningDate" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit color-purple w-100 mt-3 mb-2" id="add-user-btn">Create Account</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#addUserForm #add-user-form-roleId');
+
+        if ("@isLibrarian".toLowerCase() == "true") readonlySelect2('#addUserForm #add-user-form-roleId');
+
+        if ($('#addUserModel').length && $('#addUserModel').is(':hidden'))
+        {
+            $('#addUserModel').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#addUserForm").on("submit", "#addUserForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-user-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addUserModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-user-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-user-btn', false, 'color-purple btn-submit');
+        }
+    });
+
+    $('#transparentModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#addUserModel').css('z-index', 1051);
+    });
+
+    $('#transparentModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#addUserModel').css('z-index', 1050);
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

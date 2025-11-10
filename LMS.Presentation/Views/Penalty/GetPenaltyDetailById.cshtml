@@ -1,0 +1,56 @@
+﻿@model LMS.Application.Contracts.DTOs.Penalty.GetPenaltyDto
+
+@{
+    ViewData["Id"] = "getPenaltyModal";
+    ViewData["ModelTitle"] = "Penalty Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.UserName)</b> :
+            <img src="@Model.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(model => model.UserName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.PenaltyTypeName)</b> :
+            @Html.DisplayFor(model => model.PenaltyTypeName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.PenaltyTypeInfo)</b> :
+            @Html.DisplayFor(model => model.PenaltyTypeInfo)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Description)</b> :
+            @Html.DisplayFor(model => model.Description)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Amount)</b> :
+            @Html.DisplayFor(model => model.Amount) <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.OverDueDays)</b> :
+            @Html.DisplayFor(model => model.OverDueDays)
+        </li>
+        <li class="list-group-item status-field" style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+            <b>@Html.DisplayNameFor(model => model.StatusLabel)</b> :
+            <span class="status-dot"></span>
+            <span class="status-text">@Html.DisplayFor(model => model.StatusLabel)</span>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.TransectionDueDate)</b> :
+            @(Model.TransectionDueDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getPenaltyModal').length && $('#getPenaltyModal').is(':hidden'))
+        {
+            $('#getPenaltyModal').modal('show');
+        }
+    });
+</script>

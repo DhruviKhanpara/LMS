@@ -1,0 +1,40 @@
+﻿<!-- Stylesheets -->
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/lib/select2/css/select2.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="~/lib/toastr.js/toastr.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/floating-lables.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/select2-custom.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/LMS.Presentation.styles.css" asp-append-version="true" />
+
+<!-- JavaScript -->
+<script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/lib/select2/js/select2.min.js" asp-append-version="true"></script>
+<script src="~/lib/toastr.js/toastr.min.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/select2-custom.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="@ViewData["Id"]"
+     data-keyboard="false" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg model-view">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-purple">@ViewData["ModelTitle"]</h4>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class="modal-body">
+                @RenderBody()
+            </div>
+            <div class="modal-footer">
+                <button type='button' class='btn btn-danger button button4' data-bs-dismiss='modal'>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

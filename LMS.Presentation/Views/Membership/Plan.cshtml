@@ -1,0 +1,88 @@
+﻿@using LMS.Presentation.HTMLHelper;
+
+@model IEnumerable<LMS.Application.Contracts.DTOs.Membership.GetMembershipDto>
+
+@{
+    ViewData["Title"] = "Plan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/themes/light/pricingcardview.css" asp-append-version="true" />
+
+@Html.Heading("Membership Plans")
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                decimal price = item.Cost - item.Discount;
+                <div class="col-md-3 pricing-card-holder">
+                    <div class="pricing-card">
+                        <span class="badge bg-color-purple">@Html.DisplayFor(modelItem => item.Type)</span>
+                        <h2 class="price color-purple">
+                            <i class="fa fa-inr" aria-hidden="true"></i>
+                            <del>@Html.DisplayFor(modelItem => item.Cost)</del> @Html.DisplayFor(modelItem => price)
+                            <span>/ per month</span>
+                        </h2>
+                        <div class="color-gray text-justify mb-2 truncate-description-container" data-max-length="100" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.Description">@Html.DisplayFor(modelItem => item.Description)</div>
+                        <ul>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.BorrowLimit) :</b> 
+                                @Html.DisplayFor(modelItem => item.BorrowLimit) books at a time
+                            </li>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.ReservationLimit) :</b>
+                                @Html.DisplayFor(modelItem => item.ReservationLimit) books at a time
+                            </li>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.Duration) :</b> 
+                                @Html.DisplayFor(modelItem => item.Duration) Days
+                            </li>
+                            <li>
+                                <b>@Html.DisplayNameFor(modelItem => item.Discount) :</b> 
+                                @Html.DisplayFor(modelItem => item.Discount) <i class="fa fa-inr" aria-hidden="true"></i>
+                            </li>
+                        </ul>
+                        <a class="btn btn-submit w-100 mt-3 mb-2 color-purple proceed-button" data-plan-id="@item.Id">Proceed with me!</a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            await Html.RenderPartialAsync("_NotFoundPartial");
+        }
+    </div>
+</div>
+
+<div id="planModalContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $('.proceed-button').off("click").on("click", function ()
+        {
+            event.preventDefault();
+            var planId = $(this).data('plan-id');
+            var memberships = @Html.Raw(Json.Serialize(Model));
+            var selectedPlan = memberships.find(plan => plan.id === planId);
+
+            $.ajax({
+                url: '@Url.Action("GetAvailableLoginUserPlan", "UserMembershipMapping")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(selectedPlan),
+                success: function (result)
+                {
+                    $('#planModalContainer').html(result);
+                    $('#planSelectionModal').modal('show');
+                }
+            });
+        });
+    });
+</script>

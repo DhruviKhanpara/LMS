@@ -1,0 +1,338 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Reservation.GetUserReservationDto>
+
+@{
+    ViewData["Title"] = "GetUserReservations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var allocationStatus = nameof(ReservationsStatusEnum.Allocated);
+}
+<link rel="stylesheet" href="~/css/themes/light/UserSectionStyle.css" asp-append-version="true" />
+
+@Html.Heading("My Reservation Section")
+<div class="content">
+    <div class="mt-3 pb-2 fs-5 d-flex justify-content-center align-content-center">
+        <a class="text-link color-purple" asp-area="" asp-controller="Configs" asp-action="GetIntructions">Check rules for Reserve Book</a>
+    </div>
+
+    @if (Model.Data.Any() || Model.Data1.Any())
+    {
+        @if (Model.Data.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Active Reservations</h3>
+                <hr class="flex-grow-1" />
+            </div>
+
+            @foreach (var item in Model.Data)
+            {
+                <div class="row bg-white m-3 p-3 card-container">
+                    <div class="col-md-2 d-flex justify-content-center p-0">
+                        <img src="@item.BookCoverPage" alt="Book" class="w-100 book-image" height="150" />
+                    </div>
+                    <div class="col-md-10">
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                            <div class="d-flex gap-1 align-content-center">
+                                <div class="book-icon">
+                                    <img src="@item.BookCoverPage" alt="Book" width="30" height="30" class="rounded-circle border-dark border-1 mx-1" />
+                                </div>
+                                <h4 class="color-purple" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.StatusLabel">
+                                    @Html.DisplayFor(model => item.BookName)
+                                    <span class="status-dot" style="--textcolor:@item.StatusLabelColor;"></span>
+                                </h4>
+                            </div>
+                            <div class="section-options">
+                                <div class="d-flex justify-content-between gap-2 reservation-details-table">
+                                    <a class="color-purple bi-hover-bold allocation-check reservation-actionById-btn" 
+                                        asp-area=""
+                                        asp-controller="Transection" 
+                                        asp-action="BorrowBookForLogin" 
+                                        data-reservation-id="@item.Id"
+                                        data-reservation-book="@item.BookId" 
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="right"
+                                        title="Borrow">
+                                    <i class="bi bi-journal-plus"></i></a>
+
+                                    <a class="color-purple bi-hover-bold reservation-actionById-btn"
+                                        asp-area="" 
+                                        asp-controller="Reservation"
+                                        asp-action="CancelUserReservation"
+                                        data-reservation-id="@item.Id"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="right"
+                                        title="Cancel">
+                                    <i class="bi bi-arrow-right-square"></i></a>
+
+                                    <a class="color-purple bi-hover-bold allocation-check limit-check reservation-actionById-btn" 
+                                        asp-area=""
+                                        asp-controller="Reservation"
+                                        asp-action="TransferUserReservation" 
+                                        data-reservation-id="@item.Id"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right"
+                                        title="Transfer to other">
+                                    <i class="bi bi-shuffle"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAuthor)</b> :
+                                @Html.DisplayFor(model => item.BookAuthor)
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.ReservationDate)</b> :
+                                @item.ReservationDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.AllocateAfter)</b> :
+                                @item.AllocateAfter.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.IsAllocated)</b> :
+                                @if (item.IsAllocated == true)
+                                {
+                                    <i class="bi bi-check2 color-purple"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-lg color-purple"></i>
+                                }
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.AllocatedAt)</b> :
+                                @(item.AllocatedAt?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.TransferAllocationCount)</b> :
+                                @Html.DisplayFor(model => item.TransferAllocationCount)
+                                @if (!item.CanTransferAllocation)
+                                {
+                                    <i class="bi bi-info-circle text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="right" title="You reach to the transfer limit now can't transfer this allocation"></i>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAvailableCopies)</b> :
+                                @Html.DisplayFor(model => item.BookAvailableCopies)
+                            </div>
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookTotalCopies)</b> :
+                                @Html.DisplayFor(model => item.BookTotalCopies)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (Model.Data1.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Past Reservation</h3>
+                <hr class="flex-grow-1" />
+                <div>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn prev" data-bs-toggle="tooltip" data-bs-placement="right" title="Previous">
+                        <i class="fa fa-angle-left fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn next" data-bs-toggle="tooltip" data-bs-placement="right" title="Next">
+                        <i class="fa fa-angle-right fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            @foreach (var item in Model.Data1)
+            {
+                <div class="row bg-white m-3 p-3 card-container">
+                    <div class="col-md-2 d-flex justify-content-center p-0">
+                        <img src="@item.BookCoverPage" alt="Book" class="w-100 book-image" height="150" />
+                    </div>
+                    <div class="col-md-10">
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                            <div class="d-flex gap-1 align-content-center">
+                                <div class="book-icon">
+                                    <img src="@item.BookCoverPage" alt="Book" width="30" height="30" class="rounded-circle border-dark border-1 mx-1" />
+                                </div>
+                                <h4 class="color-purple" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.StatusLabel">
+                                    @Html.DisplayFor(model => item.BookName)
+                                    <span class="status-dot" style="--textcolor:@item.StatusLabelColor;"></span>
+                                </h4>
+                            </div>
+                            <div class="section-options">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAuthor)</b> :
+                                @Html.DisplayFor(model => item.BookAuthor)
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.ReservationDate)</b> :
+                                @item.ReservationDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.AllocateAfter)</b> :
+                                @item.AllocateAfter.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.IsAllocated)</b> :
+                                @if (item.IsAllocated == true)
+                                {
+                                    <i class="bi bi-check2 color-purple"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-lg color-purple"></i>
+                                }
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.AllocatedAt)</b> :
+                                @(item.AllocatedAt?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.CancelReason)</b> :
+                                <span class="truncate-description-container" data-max-length="20" data-bs-toggle="tooltip" data-bs-placement="right" title="@(item.CancelReason != null ? Html.DisplayFor(modelItem => item.CancelReason) : "-")">@(item.CancelReason != null ? Html.DisplayFor(modelItem => item.CancelReason) : "-")</span>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAvailableCopies)</b> :
+                                @Html.DisplayFor(model => item.BookAvailableCopies)
+                            </div>
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookTotalCopies)</b> :
+                                @Html.DisplayFor(model => item.BookTotalCopies)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_NotFoundPartial");
+    }
+</div>
+
+<div id="reservationContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        updatePaginationBtnStatus();
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
+
+        if (successToastMessage)
+        {
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
+        }
+
+        var allocationLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => m.IsAllocated && m.StatusLabel == @allocationStatus)));
+        var transferLimitLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => m.CanTransferAllocation)));
+
+        $(".allocation-check").each(function ()
+        {
+            var reservationId = $(this).data("reservation-id");
+            var isAllocated = allocationLookup[reservationId];
+
+            if (!isAllocated)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to book not allocated")
+                    .removeAttr("data-reservation-book")
+                    .removeAttr("data-reservation-id");
+            }
+        });
+
+        $(".limit-check").each(function ()
+        {
+            var reservationId = $(this).data("reservation-id");
+            if (reservationId != undefined)
+            {
+                var canTransfer = transferLimitLookup[reservationId];
+
+                if (!canTransfer)
+                {
+                    $(this).addClass("btn-submit-disabled")
+                        .attr("title", "Disabled due to transfer limit is over now just borrow or cancle the reservation")
+                        .removeAttr("data-reservation-book")
+                        .removeAttr("data-reservation-id");
+                }
+            }
+        })
+
+        $(".pagination-btn").off("click").on("click", function (e)
+        {
+            e.preventDefault();
+            let currentPage = @Model.Pagination.PageNumber;
+
+            if ($(this).hasClass("disabled")) return;
+            else if ($(this).hasClass("prev") && currentPage > 1) currentPage--;
+            else if ($(this).hasClass("next") && currentPage < @Model.Pagination.PageCount) currentPage++;
+
+            updatePaginationBtnStatus();
+            callApiWithFilter(currentPage);
+        });
+
+        $('.reservation-details-table .reservation-actionById-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            let bookId = $(this).data("reservation-book");
+
+            if (bookId !== undefined)
+            {
+                var message = "Are you sure you want borrow this book?";
+                setProceedButtonHref(this, message, "bookId=" + bookId);
+            }
+            else
+            {
+                let id = $(this).data("reservation-id");
+
+                if (id !== undefined)
+                {
+                    var message = "Are you sure you want to continue with this action?";
+                    setProceedButtonHref(this, message, "id=" + id);
+                }
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+    });
+
+    function updatePaginationBtnStatus()
+    {
+        $(".pagination-btn").removeClass("btn-submit-disabled");
+        $(".pagination-btn").removeClass("btn-submit-disabled-border");
+        if (@Model.Pagination.PageNumber === 1)
+            toggleButtonState('.pagination-btn.prev', true, 'bg-color-purple text-light');
+
+        if (@Model.Pagination.PageNumber === @Model.Pagination.PageCount)
+            toggleButtonState('.pagination-btn.next', true, 'bg-color-purple text-light');
+    }
+
+    function callApiWithFilter(pageNumber)
+    {
+        let currentUrl = window.location.href;
+        const url = new URL(currentUrl);
+
+        url.searchParams.set("pageNumber", pageNumber);
+
+        if (pageNumber !== undefined)
+            window.location.href = url;
+    }
+</script>

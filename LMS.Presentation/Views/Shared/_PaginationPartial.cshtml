@@ -1,0 +1,79 @@
+﻿@model LMS.Common.Models.PaginationModel;
+
+@{
+    await Html.RenderPartialAsync("_PaginationModalPartial", Model);
+}
+
+<script>
+    $(document).ready(function ()
+    {
+        const pageCount = parseInt("@Model.PageCount", 10);
+        let currentPage = parseInt("@Model.PageNumber", 10);
+        let pageSize = parseInt("@Model.PageSize", 10);
+        let totalCount = parseInt("@Model.TotalCount", 10);
+
+        const pageSizeOptions = [10, 20, 30, 40, 50, 100];
+
+        updatePagination();
+
+        $(".pagination-btn").off("click").on("click", function (e)
+        {
+            e.preventDefault(); 
+            if ($(this).hasClass("disabled")) return;
+            if ($(this).hasClass("first")) currentPage = 1;
+            else if ($(this).hasClass("prev") && currentPage > 1) currentPage--;
+            else if ($(this).hasClass("next") && currentPage < pageCount) currentPage++;
+            else if ($(this).hasClass("last")) currentPage = pageCount; 
+            
+            updatePagination();
+            callApiForPagination(currentPage, pageSize);
+        });
+
+        $("#pageNumber").off("blur").on("blur", function ()
+        {
+            const inputPage = parseInt($(this).val(), 10);
+            if (inputPage >= 1 && inputPage <= pageCount && inputPage != currentPage)
+            {
+                currentPage = inputPage;
+                updatePagination();
+                callApiForPagination(currentPage, pageSize);
+            } else
+            {
+                $(this).val(currentPage);
+            }
+        });
+
+        $("#pageSize").off("change").on("change", function ()
+        {
+            pageSize = parseInt($(this).val(), 10);
+            currentPage = 1;
+            updatePagination();
+            callApiForPagination(currentPage, pageSize);
+        });
+
+        function updatePagination()
+        {
+            $("#pageNumber").val(currentPage);
+            $("#pageSize").val(pageSizeOptions.includes(pageSize) ? pageSize : 10);
+
+            $(".pagination-btn").removeClass("btn-submit-disabled");
+            $(".pagination-btn").removeClass("btn-submit-disabled-border");
+            if (currentPage === 1)
+                toggleButtonState('.pagination-btn.first, .pagination-btn.prev', true, 'bg-color-purple text-light');
+
+            if (currentPage === pageCount)
+                toggleButtonState('.pagination-btn.next, .pagination-btn.last', true, 'bg-color-purple text-light');
+        }
+
+        function callApiForPagination(pageNumber, pageSize)
+        {
+            let currentUrl = window.location.href;
+            const url = new URL(currentUrl);
+
+            url.searchParams.set("pageNumber", pageNumber);
+            url.searchParams.set("pageSize", pageSize);
+
+            window.location.href = url;
+        }
+    });
+</script>

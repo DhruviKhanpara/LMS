@@ -1,0 +1,391 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Reservation.GetReservationDto>
+
+@{
+    ViewData["Title"] = "GetReservations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var allocationStatus = nameof(ReservationsStatusEnum.Allocated);
+    var reserveStatus = (long)ReservationsStatusEnum.Reserved;
+    var cancleStatus = (long)ReservationsStatusEnum.Cancelled;
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+<script src="~/js/sorting.js" asp-append-version="true"></script>
+<script src="~/js/filterSelector.js" asp-append-version="true"></script>
+
+@Html.Heading("Reservation Information")
+<div class="container-fluid my-1">
+    <div class="d-flex justify-content-end flex-wrap px-3 my-3 gap-3">
+        <div>
+            <a class="btn btn-submit color-purple" id="reservation-add-btn">Create Reservation</a>
+        </div>
+        <div>
+            <a asp-area="" asp-controller="Reservation" asp-action="GetExportReservation" class="btn btn-submit color-purple">Export Reservation</a>
+        </div>
+        @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin)))
+        {
+            <div class="did-floating-label-content m-0 w-15">
+                <select class="did-floating-select select2-single filter-options" data-params="activeData" id="data-selection-option" value="">
+                    <option value="">Removed and Active Data</option>
+                    <option value="true">Active Data</option>
+                    <option value="false">Removed Data</option>
+                </select>
+            </div>
+        }
+        <div class="did-floating-label-content m-0 w-15">
+            <select id="get-reservation-form"
+                    class="did-floating-select select2-single filter-options" 
+                    data-params="user"
+                    asp-items="@(Model.Selections.ContainsKey("Users") ? Model.Selections["Users"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">User</label>
+        </div>
+        <div class="did-floating-label-content  m-0 w-15">
+            <select id="get-reservation-form-bookId"
+                    class="did-floating-select select2-single filter-options" 
+                    data-params="book"
+                    asp-items="@(Model.Selections.ContainsKey("Books") ? Model.Selections["Books"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Book</label>
+        </div>
+    </div>
+    <div class="table-responsive scrollable-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="px-3">User</th>
+                    <th class="sortable-header" data-field="BookName">Book</th>
+                    <th class="sortable-header text-center" data-field="StatusLabel">Status</th>
+                    <th class="sortable-header text-center" data-field="ReservationDate">Reservation Date</th>
+                    <th class="sortable-header text-center" data-field="AllocateAfter">Allocate after?</th>
+                    <th class="sortable-header text-center" data-field="IsAllocated">Allocated?</th>
+                    <th class="sortable-header text-center" data-field="AllocatedAt">Allocate Date</th>
+                    <th class="sortable-header text-center" data-field="TransferAllocationCount">Transfer Allocation Count</th>
+                    <th class="sortable-header text-center" data-field="CancelDate">Cancel Date</th>
+                    <th class="sortable-header text-center" data-field="CancelReason">Cancel reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Data is not null && Model.Data.Any())
+                {
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="@(item.IsRemoved ? "bg-color-danger" : "bg-color-default")">
+                            <td>
+                                <div class="d-flex justify-content-between gap-3 reservation-details-table">
+                                    @if (User.Identity.IsAuthenticated && (User.IsInRole(nameof(RoleListEnum.Librarian)) || User.IsInRole(nameof(RoleListEnum.Admin))) && !item.IsRemoved)
+                                    {
+                                        <a class="color-purple bi-hover-bold reservation-actionById-btn"
+                                            asp-area=""
+                                            asp-controller="Reservation"
+                                            asp-action="GetReservationDetailById" 
+                                            data-reservation-id="@item.Id" 
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            title="Detail">
+                                        <i class="bi bi-exclamation-circle"></i></a>
+
+                                        <a class="color-purple bi-hover-bold reservation-actionById-btn"
+                                            asp-area="" 
+                                            asp-controller="Reservation" 
+                                            asp-action="UpdateReservation"
+                                            data-reservation-id="@item.Id"
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="right"
+                                            title="Edit">
+                                        <i class="bi bi-pencil-square"></i></a>
+
+                                        <a class="color-purple bi-hover-bold reservation-delete-btn" 
+                                            asp-area="" 
+                                            asp-controller="Reservation" 
+                                            asp-action="RemoveReservation"
+                                            data-reservation-id="@item.Id" 
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right" 
+                                            title="Delete">
+                                        <i class="bi bi-trash3"></i></a>
+
+                                        <a class="color-purple bi-hover-bold reservation-borrow-btn"
+                                            asp-area="" 
+                                            asp-controller="Transection"
+                                            asp-action="BorrowBook"
+                                            data-reservation-id="@item.Id"
+                                            data-reservation-book="@item.BookId"
+                                            data-reservation-user="@item.UserId"
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="right"
+                                            title="Borrow">
+                                        <i class="bi bi-journal-plus"></i></a>
+                                    }
+
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin)))
+                                    {
+                                        <a class="color-purple bi-hover-bold reservation-actionById-btn"
+                                            asp-area=""
+                                            asp-controller="Log"
+                                            asp-action="GetReservationAuditHistoryByReservationId"
+                                            data-reservation-id="@item.Id"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            title="History">
+                                        <i class="bi bi-clock-history"></i></a>
+
+                                        @if (item.IsRemoved)
+                                        {
+                                            @* restore *@
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <img src="@item.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(modelItem => item.UserName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BookName)
+                            </td>
+                            <td class="text-center">
+                                <div class="status-clip @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                     style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                    @Html.DisplayFor(modelItem => item.StatusLabel)
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @item.ReservationDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                            </td>
+                            <td class="text-center">
+                                @item.AllocateAfter.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                            </td>
+                            <td class="text-center">
+                                @if (item.IsAllocated == true)
+                                {
+                                    <i class="bi bi-check2 color-purple"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-lg color-purple"></i>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.AllocatedAt?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @Html.DisplayFor(modelItem => item.TransferAllocationCount)
+                            </td>
+                            <td class="text-center">
+                                @(item.CancelDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                            </td>
+                            <td class="truncate-description-container" data-max-length="30" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.CancelReason">
+                                @(item.CancelReason != null ? Html.DisplayFor(modelItem => item.CancelReason) : "-")
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" class="text-center border-0">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @{
+        await Html.RenderPartialAsync("_PaginationPartial", Model.Pagination);
+    }
+</div>
+
+<div id="reservationContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
+
+        if (successToastMessage)
+        {
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
+        }
+
+        var allocationLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => m.IsAllocated && m.StatusLabel == @allocationStatus)));
+
+        $(".reservation-borrow-btn").each(function ()
+        {
+            var reservationId = $(this).data("reservation-id");
+            var isAllocated = allocationLookup[reservationId];
+            
+            if (!isAllocated)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to book not allocated")
+                    .removeAttr("data-reservation-user")
+                    .removeAttr("data-reservation-book")
+                    .removeAttr("data-reservation-id");
+            }
+        });
+
+        $('#reservation-add-btn').off("click").on("click", function ()
+        {
+            event.preventDefault();
+            toggleButtonState('#reservation-add-btn', true, 'color-purple btn-submit');
+
+            $.ajax({
+                url: '@Url.Action("AddReservation", "Reservation")',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (result)
+                {
+                    $('#reservationContainer').html(result);
+                }
+            });
+            toggleButtonState('#reservation-add-btn', false, 'color-purple btn-submit');
+        });
+
+        $('.reservation-details-table .reservation-delete-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            var reservationId = $(this).data('reservation-id');
+
+            if (reservationId !== undefined)
+            {
+                var message = "Are you sure you want delete this reservation?";
+                setProceedButtonHref(this, message, "id=" + reservationId);
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+
+        $('.reservation-details-table .reservation-actionById-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            var reservationId = $(this).data('reservation-id');
+
+            if (reservationId !== undefined)
+            {
+                $.ajax({
+                    url: $(this).attr("href"),
+                    data: { id: reservationId },
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (result)
+                    {
+                        $('#reservationContainer').html(result);
+                    }
+                });
+            }
+            
+            $(this).removeClass("btn-submit-disabled");
+        });
+
+        $('.reservation-details-table .reservation-borrow-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            let bookId = $(this).data("reservation-book");
+            let userId = $(this).data("reservation-user");
+
+            if (bookId !== undefined && userId !== undefined)
+            {
+                var message = "Are you sure you want borrow this book?";
+                setProceedButtonHref(this, message, "bookId=" + bookId + "&userId=" + userId);
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+    });
+
+    function validateDates(triggeredField)
+    {
+        let reservationDate = new Date($("#reservationDate").val());
+        let allocateAfterDate = new Date($("#allocateAfter").val());
+        let allocateDate = new Date($("#allocateDate").val());
+        let cancelDate = new Date($("#cancelDate").val());
+
+        if (!isNaN(reservationDate))
+        {
+            if (!isNaN(allocateAfterDate) && reservationDate > allocateAfterDate)
+            {
+                toastr.error("Reservation Date must be earlier than AllocateAfter Date!", "Error");
+                $(triggeredField).val("");
+            }
+            if (!isNaN(allocateDate) && reservationDate > allocateDate)
+            {
+                toastr.error("Reservation Date must be earlier then Allocate Date!", "Error");
+                $(triggeredField).val("");
+            }
+            if (!isNaN(cancelDate) && reservationDate > cancelDate) 
+            {
+                toastr.error("Reservation Date must be earlier then Cancel Date!", "Error");
+                $(triggeredField).val("");
+            }
+        }
+
+        if (!isNaN(allocateDate) && !isNaN(cancelDate) && allocateDate > cancelDate)
+        {
+            toastr.error("Allocate Date must be earlier then Cancel Date!", "Error");
+            $(triggeredField).val("");
+        }
+    }
+
+    function toggleAllocateDate(triggeredField, allocateDate = null)
+    {
+        if (Number($(triggeredField).val()) === @reserveStatus)
+        {
+            if (allocateDate)
+                $("#allocateDate").val(allocateDate).prop("readonly", true);
+            else
+                $("#allocateDate").val("").prop("readonly", true);
+        } else
+        {
+            $("#allocateDate").prop("readonly", false);
+        }
+    }
+
+    function toggleCancleControlls(triggeredField)
+    {
+        if (Number($(triggeredField).val()) != @cancleStatus)
+        {
+            $("#cancleReason").val("").prop("readonly", true);
+            $("#cancelDate").val("").prop("readonly", true);
+        } else
+        {
+            $("#cancleReason").prop("readonly", false);
+            $("#cancelDate").prop("readonly", false);
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

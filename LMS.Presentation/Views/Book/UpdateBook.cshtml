@@ -1,0 +1,246 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Books.UpdateBookDto
+
+@{
+    ViewData["Id"] = "updateBookModal";
+    ViewData["ModelTitle"] = "Edit Book";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+
+    var coverPage = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.CoverPage), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+
+    var bookPreview = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.BookPreview), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .update-book-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+<form asp-action="UpdateBook" class="needs-validation" id="updateBookForm" method="post" enctype="multipart/form-data">
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="Title" class="did-floating-input" placeholder="" />
+            <label asp-for="Title" class="did-floating-label">Title<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="BookDescription" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="BookDescription" class="did-floating-label">Book Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="BookDescription" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Isbn" class="did-floating-input" placeholder="" />
+                <label asp-for="Isbn" class="did-floating-label">ISBN<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Isbn" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-book-form-genreId"
+                    class="did-floating-select select2-single"
+                    asp-items="@Model.GenreList"
+                    asp-for="GenreId"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="GenreId" class="did-floating-label">Genre<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="GenreId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <select id="update-book-form-statusId"
+                    class="did-floating-select select2-single"
+                    asp-items="@Model.BookStatusList"
+                    asp-for="StatusId"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="StatusId" class="did-floating-label">Status<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="StatusId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Author" class="did-floating-input" placeholder="" />
+                <label asp-for="Author" class="did-floating-label">Author<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Publisher" class="did-floating-input" placeholder="" />
+                <label asp-for="Publisher" class="did-floating-label">Publisher<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Publisher" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="PublishAt" type="datetime-local" max='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' class="did-floating-input" placeholder="" />
+                <label asp-for="PublishAt" class="did-floating-label">Publish Date<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="PublishAt" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="AuthorDescription" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="AuthorDescription" class="did-floating-label">Author Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="AuthorDescription" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Price" type="number" class="did-floating-input" placeholder="" />
+                <label asp-for="Price" class="did-floating-label">Price<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="TotalCopies" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="TotalCopies" class="did-floating-label">Total Copy<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="TotalCopies" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md update-book-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="AvailableCopies" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="AvailableCopies" class="did-floating-label">Available Copy<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md update-book-form-col">
+            <div class="mb-2">
+                <label asp-for="CoverPage" class="control-label">Cover Page<sup class="text-danger">*</sup></label>
+                <input asp-for="CoverPage" type="file" accept=".jpg, .jpeg, .png" class="form-control file-input" data-flag="isDeletedCoverPage" />
+                <span asp-validation-for="CoverPage" class="text-danger"></span>
+            </div>
+            <div class="file-preview">
+                @if (coverPage is not null && !string.IsNullOrWhiteSpace(coverPage.fileLocation))
+                {
+                    <div class="file-container d-flex align-content-center gap-2">
+                        <div class="image-preview">
+                            <img src="@coverPage.fileLocation" class="img-thumbnail" width="100" alt="Cover page" data-bs-toggle="tooltip" data-bs-placement="right" title="Cover page" onclick="showDocumentModal('@coverPage.fileLocation')" />
+                            <span class='remove-file img-overlay'><i class="bi bi-x-lg"></i></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-md update-book-form-col">
+            <div class="mb-2">
+                <label asp-for="BookPreview" class="control-label">Book Preview</label>
+                <input asp-for="BookPreview" type="file" accept=".pdf" class="form-control file-input" data-flag="isDeletedBookPreview" />
+                <span asp-validation-for="BookPreview" class="text-danger"></span>
+            </div>
+            <div class="file-preview">
+                @if (bookPreview is not null && !string.IsNullOrWhiteSpace(bookPreview.fileLocation))
+                {
+                    <div class="file-container d-flex gap-2">
+                        <div class="image-preview">
+                            <div class="img-thumbnail" onclick="showDocumentModal('@bookPreview.fileLocation')">
+                                <i class="bi bi-file-earmark-pdf-fill fs-1"></i>
+                            </div>
+                            <span class='remove-file img-overlay'><i class="bi bi-x-lg"></i></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="update-book-btn">Update Book</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#updateBookForm #update-book-form-statusId');
+        removeSingleDropdownValueAttr('#updateBookForm #update-book-form-genreId');
+
+        if ($('#updateBookModal').length && $('#updateBookModal').is(':hidden'))
+        {
+            $('#updateBookModal').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#updateBookForm").on("submit", "#updateBookForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-book-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+            formData.set("IsDeletedCoverPage", flags.isDeletedCoverPage ?? false);
+            formData.set("IsDeletedBookPreview", flags.isDeletedBookPreview ?? false);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updateBookModal .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-book-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-book-btn', false, 'color-purple btn-submit');
+        }
+    });
+
+    $('#transparentModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#updateBookModal').css('z-index', 1051);
+    });
+
+    $('#transparentModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#updateBookModal').css('z-index', 1050);
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

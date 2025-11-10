@@ -1,0 +1,298 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+@using LMS.Common.Helpers;
+@inject IHttpContextAccessor httpContextAccessor;
+
+@model LMS.Application.Contracts.DTOs.User.UserProfileDto
+
+@{
+    ViewData["Title"] = "GetUserProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var loninUserId = httpContextAccessor.HttpContext!.GetUserId();
+}
+
+<style>
+    body {
+        background-color: #f9f5ff;
+    }
+
+    .profile-img {
+        border: 10px solid #f9f5ff;
+    }
+
+    .user-profile-btn {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        border: none;
+        border-radius: 50%;
+        padding: 0px 6px;
+        font-weight: bold;
+    }
+
+    @@media(max-width: 1155px)
+    {
+        .col-md-3 {
+            width: 100%;
+        }
+
+        .col-md-9 {
+            width: 100%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+@Html.Heading("Profile")
+<div class="container-fluid my-2">
+    <div class="row">
+        <div class="col-md-3 p-2">
+            <div class="card px-1 py-4 rounded-3">
+                <div class="align-self-center text-center">
+                    <div>
+                        <div class="image-preview">
+                            <img src="@Model.ProfilePhoto" alt="User" width="200" height="200" class="profile-img rounded-circle cursor-pointer mx-1" onclick="showDocumentModal('@Model.ProfilePhoto')" />
+                            <a class="color-purple rounded-circle bg-warning bi-hover-bold user-profile-btn" asp-area="" asp-controller="User" asp-action="ChangeProfile" data-bs-toggle="tooltip" data-bs-placement="right" title="Update Profile"><i class="bi bi-camera fs-4"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        @Html.DisplayFor(model => model.FirstName)
+                        @Html.DisplayFor(model => model.MiddleName)
+                        @Html.DisplayFor(model => model.LastName)
+                    </div>
+                    <div class="color-gray">
+                        @Html.DisplayFor(model => model.Role)
+                    </div>
+                </div>
+                <hr />
+                <div class="align-self-center text-center">
+                    @if (User.Identity.IsAuthenticated && (User.IsInRole(nameof(RoleListEnum.User))))
+                    {
+                        <div>
+                            <b>@Html.DisplayNameFor(model => model.LibraryCardNumber) :</b>
+                            @Html.DisplayFor(model => model.LibraryCardNumber)
+                        </div>
+                        <div class="mt-2">
+                            <a asp-area="" asp-controller="User" asp-action="DownloadLibraryCard" class="text-link color-purple" id="libraryCard-download" data-user-id="@Model.Id">Download Library card</a>
+                        </div>
+                    }
+                    <div class="mt-3 mb-2">
+                        <a class="btn btn-submit w-100 color-purple proceed-button" id="update-password-btn">Update Password</a>
+                        <a class="btn btn-submit w-100 mt-2 color-purple proceed-button" id="user-update-btn">Update Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 p-2">
+            <div class="card p-1 mb-3">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <b>Name</b> :
+                        @Html.DisplayFor(model => model.FirstName)
+                        @Html.DisplayFor(model => model.MiddleName)
+                        @Html.DisplayFor(model => model.LastName)
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.Username)</b> :
+                        @Html.DisplayFor(model => model.Username)
+                    </li>
+                    <li class="list-group-item status-field">
+                        <b>@Html.DisplayNameFor(model => model.Role)</b> :
+                        <span class="status-dot"></span>
+                        <span calss="status-text">@Html.DisplayFor(model => model.Role)</span>
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.LibraryCardNumber)</b> :
+                        @Html.DisplayFor(model => model.LibraryCardNumber)
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.JoiningDate)</b> :
+                        @Model.JoiningDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.Gender)</b> :
+                        @Html.DisplayFor(model => model.Gender)
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.Dob)</b> :
+                        @Model.Dob.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.MobileNo)</b> :
+                        @Html.DisplayFor(model => model.MobileNo)
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.Email)</b> :
+                        @Html.DisplayFor(model => model.Email)
+                    </li>
+                    <li class="list-group-item">
+                        <b>@Html.DisplayNameFor(model => model.Address)</b> :
+                        @Html.DisplayFor(model => model.Address)
+                    </li>
+                </ul>
+            </div>
+            
+            @if (User.Identity.IsAuthenticated && (User.IsInRole(nameof(RoleListEnum.User))))
+            {
+                <div class="text-center card mb-3 p-2">
+                    <h4 class="fw-bold m-0 color-purple">Your Activity</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <ul class="list-group">
+                            <li class="list-group-item item @(Model.ActiveMembershipCount==0 ? "status-field bg-color-danger" : "")">
+                                <b>@Html.DisplayNameFor(model => model.ActiveMembershipCount) :</b>
+                                <span class="status-dot @(Model.ActiveMembershipCount==0 ? "bg-danger" : "bg-primary")"></span>
+                                <span class="count" data-number="@Model.ActiveMembershipCount"></span>
+                            </li>
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.ActiveReservationCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.ActiveReservationCount"></span>
+                            </li>
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.OccupiedBookCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.OccupiedBookCount"></span>
+                            </li>
+                            <li class="list-group-item item @(Model.PenaltyCount!=0 ? "status-field bg-color-danger" : "")">
+                                <b>@Html.DisplayNameFor(model => model.PenaltyCount) :</b>
+                                <span class="status-dot @(Model.PenaltyCount!=0 ? "bg-danger" : "bg-primary")"></span>
+                                <span class="count" data-number="@Model.PenaltyCount"></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md">
+                        <ul class="list-group">
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.TotalMembershipCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.TotalMembershipCount"></span>
+                            </li>
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.TotalReservationCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.TotalReservationCount"></span>
+                            </li>
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.TotalOccupiedBookCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.TotalOccupiedBookCount"></span>
+                            </li>
+                            <li class="list-group-item item">
+                                <b>@Html.DisplayNameFor(model => model.TotalPenaltyCount) :</b>
+                                <span class="status-dot bg-primary"></span>
+                                <span class="count" data-number="@Model.TotalPenaltyCount"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div id="userProfileContainer"></div>
+<div id="imageModalContainer">
+    @Html.TransparentModal()
+</div>
+
+<script>
+    let count = document.querySelectorAll(".count")
+    let arr = Array.from(count)
+
+    arr.map(function (item)
+    {
+        let startnumber = 0;
+
+        function counterup()
+        {
+            item.innerHTML = startnumber;
+            if (startnumber == item.dataset.number)
+            {
+                clearInterval(stop)
+            }
+            startnumber++;
+        }
+
+        let stop = setInterval(function ()
+        {
+            counterup()
+        }, 100)
+
+    });
+
+    $('#update-password-btn').off('click').on('click', function ()
+    {
+        event.preventDefault();
+        toggleButtonState('#update-password-btn', true, 'color-purple btn-submit');
+
+        $.ajax({
+            url: '@Url.Action("ChangePassword", "User")',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (result)
+            {
+                $('#userProfileContainer').html(result);
+            }
+        });
+        toggleButtonState('#update-password-btn', false, 'color-purple btn-submit');
+    });
+
+    $('#user-update-btn').off('click').on('click', function () 
+    {
+        event.preventDefault();
+        toggleButtonState('#user-update-btn', true, 'color-purple btn-submit');
+
+        $.ajax({
+            url: '@Url.Action("UpdateUser", "User")',
+            data: { id: @loninUserId },
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (result)
+            {
+                $('#userProfileContainer').html(result);
+            }
+        });
+        toggleButtonState('#user-update-btn', false, 'color-purple btn-submit');
+    });
+
+    $('.user-profile-btn').off('click').on('click', function ()
+    {
+        event.preventDefault();
+        toggleButtonState('.user-profile-btn', true, 'color-purple btn-submit');
+
+        $.ajax({
+            url: $(this).attr("href"),
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (result)
+            {
+                $('#userProfileContainer').html(result);
+            }
+        });
+        toggleButtonState('.user-profile-btn', false, 'color-purple btn-submit');
+    });
+
+    $('#libraryCard-download').off("click").on("click", function (event)
+    {
+        event.preventDefault();
+        $(this).addClass("btn-submit-disabled");
+
+        var userId = $(this).data('user-id');
+        var url = $(this).attr('href');
+                
+        const link = document.createElement('a');
+        link.href = url + "?userId=" + userId;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        $(this).removeClass("btn-submit-disabled");
+
+        toastr.success("You get you Library card in the download folder.", "Success");
+    });
+</script>

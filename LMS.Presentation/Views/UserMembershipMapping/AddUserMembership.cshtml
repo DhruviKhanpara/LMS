@@ -1,0 +1,216 @@
+﻿@model LMS.Application.Contracts.DTOs.UserMembershipMapping.AddUserMembershipDto
+
+@{
+    ViewData["Id"] = "addUserMembershipModel";
+    ViewData["ModelTitle"] = "Add User Membership";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<style>
+    tr:has(.form-check-input:checked) {
+        background-color: #d5c8e14a;
+    }
+
+    @@media (min-width: 500px) {
+        .add-user-membership-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/stepperform.js" asp-append-version="true"></script>
+
+<div class="progress mb-2" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-color-purple" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<form asp-action="AddUserMembership" class="needs-validation" id="addUserMembershipForm" method="post">
+    <i class="bi bi-arrow-left-circle bi-hover-bold cursor-pointer color-purple font-weight-bold position-absolute fs-2 action step-back"></i>
+
+    <div id="step1" class="card-body step">
+        <div class="text-center color-purple mb-4">
+            <h4 class="card-title font-weight-bold">Select User and Add plan option</h4>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 add-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-user-membership-form-userId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.Users"
+                            asp-for="UserId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="UserId" class="did-floating-label">User<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 add-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <select id="add-user-membership-form-isUpgradePlan"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.AddPlanOptions"
+                            asp-for="IsUpgradePlan"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="IsUpgradePlan" class="did-floating-label">Add Plan option<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="IsUpgradePlan" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="step2" class="card-body step" style="display: none;">
+        <div class="text-center mb-3">
+            <h4 class="card-title color-purple">Select Membership</h4>
+        </div>
+        <div class="text-center">
+            <div class="table-responsive scrollable-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="sortable-header" data-field="Type">Type</th>
+                            <th class="sortable-header text-center" data-field="BorrowLimit">Borrow Limit</th>
+                            <th class="sortable-header text-center" data-field="ReservationLimit">Reservation Limit</th>
+                            <th class="sortable-header text-center" data-field="Duration">Duration in Days</th>
+                            <th class="sortable-header text-center" data-field="Cost">Cost</th>
+                            <th class="sortable-header text-center" data-field="Discount">Discount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Memberships is not null && Model.Memberships.Any())
+                        {
+                            @foreach (var item in Model.Memberships)
+                            {
+                                <tr class="bg-color-default cursor-pointer">
+                                    <td>
+                                        <input class="form-check-input radio" type="radio" asp-for="MembershipId" value="@item.Id">
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Type)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.BorrowLimit)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.ReservationLimit)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Duration)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Cost)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Discount)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center border-0">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <span asp-validation-for="MembershipId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-2 mb-2">
+        <button type="button" class="btn btn-submit w-100 action step-next">Next</button>
+        <button type="submit" class="btn btn-submit w-100 action submit" id="add-user-membership-btn">Add User Membership</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#addUserMembershipForm #add-user-membership-form-userId');
+        removeSingleDropdownValueAttr('#addUserMembershipForm #add-user-membership-form-isUpgradePlan');
+
+        var userEligibleForAdd = @Html.Raw(Json.Serialize(Model.DisableAddForUserCondition));
+
+        $("#add-user-membership-form-userId").on('change', function ()
+        {
+            var selectedValue = $(this).val();
+            var shouldDisable = !userEligibleForAdd[selectedValue] || false;
+
+            if (shouldDisable)
+            {
+                if ($('#add-user-membership-form-isUpgradePlan').val() == 'false')
+                    $('#add-user-membership-form-isUpgradePlan').val("").trigger('change');
+
+                setSelect2OptionAccessibility('#addUserMembershipForm #add-user-membership-form-isUpgradePlan', ["false"], true);
+            }
+            else
+                setSelect2OptionAccessibility('#addUserMembershipForm #add-user-membership-form-isUpgradePlan', ["false"], false);
+        });
+
+        if ($('#addUserMembershipModel').length && $('#addUserMembershipModel').is(':hidden'))
+        {
+            $('#addUserMembershipModel').modal('show');
+        }
+
+        $("tr").off('click').on('click', function ()
+        {
+            $(this).find(".form-check-input.radio").prop("checked", true);
+        });
+    });
+
+    $(document).off("submit", "#addUserMembershipForm").on("submit", "#addUserMembershipForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-user-membership-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addUserMembershipModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-user-membership-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-user-membership-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,89 @@
+﻿body {
+    background-color: #f9f5ff;
+}
+
+.card-container {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    border-radius: 5px;
+    border: 1px solid white;
+}
+
+.card-container:hover {
+    border-color: #5a2d82;
+    box-shadow: 0 0 15px rgba(90, 45, 130, 0.3);
+}
+
+.section-col {
+    width: 33.33%;
+    flex: none;
+}
+
+.book-image {
+    width: 125px !important;
+}
+
+.book-icon {
+    display: none;
+}
+
+@media (max-width: 1373px) {
+    .section-col {
+        width: 50%;
+    }
+}
+
+@media (max-width: 1088px) {
+    .section-col {
+        width: 100%;
+    }
+}
+
+@media (max-width: 992px) and (min-width: 919px) {
+    .section-col {
+        width: 50%;
+    }
+}
+
+@media (max-width: 918px) {
+    .section-col {
+        width: 100%;
+    }
+}
+
+@media (max-width: 788px) {
+    .col-md-4 {
+        width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    .col-md-2 {
+        flex: 0 0 auto;
+        width: 20%;
+    }
+
+    .col-md-10 {
+        flex: 0 0 auto;
+        width: 80%;
+    }
+}
+
+@media (max-width: 600px) {
+    .col-md-2 {
+        display: none !important;
+    }
+
+    .book-icon {
+        display: block;
+    }
+
+    .col-md-10 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 450px) {
+    .col-md-4 {
+        width: 100%;
+    }
+}

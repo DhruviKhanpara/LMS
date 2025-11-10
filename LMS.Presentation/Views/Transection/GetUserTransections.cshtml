@@ -1,0 +1,331 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Transection.GetUserTransectionDto>
+
+@{
+    ViewData["Title"] = "GetUserTransections";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/themes/light/UserSectionStyle.css" asp-append-version="true" />
+
+@Html.Heading("My Check-out Books Section")
+<div class="content">
+    <div class="mt-3 fs-5 d-flex justify-content-center align-content-center">
+        <a class="text-link color-purple" asp-area="" asp-controller="Configs" asp-action="GetIntructions">Check rules for Check-out actions</a>
+    </div>
+
+    @if (Model.Data.Any() || Model.Data1.Any())
+    {
+        @if (Model.Data.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Active Check-out Books</h3>
+                <hr class="flex-grow-1" />
+            </div>
+
+            @foreach (var item in Model.Data)
+            {
+                <div class="row bg-white m-3 p-3 card-container">
+                    <div class="col-md-2 d-flex justify-content-center p-0">
+                        <img src="@item.BookCoverPage" alt="Book" class="w-100 book-image" height="150" />
+                    </div>
+                    <div class="col-md-10">
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                            <div class="d-flex gap-1 align-content-center">
+                                <div class="book-icon">
+                                    <img src="@item.BookCoverPage" alt="Book" width="30" height="30" class="rounded-circle border-dark border-1 mx-1" />
+                                </div>
+                                <h4 class="color-purple" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.StatusLabel">
+                                    @Html.DisplayFor(model => item.BookName)
+                                    <span class="status-dot" style="--textcolor:@item.StatusLabelColor;"></span>
+                                </h4>
+                            </div>
+                            <div class="section-options">
+                                <div class="d-flex justify-content-between gap-2 transection-details-table">
+                                    <a class="color-purple bi-hover-bold transection-actionById-btn" 
+                                        asp-area="" 
+                                        asp-controller="Transection"
+                                        asp-action="ReturnBorrowBook"
+                                        data-id="@item.Id"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right" 
+                                        title="Return">
+                                    <i class="bi bi-arrow-right-square"></i></a>
+
+                                    <a class="color-purple bi-hover-bold transection-actionById-btn renew-btn"
+                                        asp-area=""
+                                        asp-controller="Transection" 
+                                        asp-action="RenewBorrowBook" 
+                                        data-id="@item.Id"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right"
+                                        title="Renew">
+                                    <i class="bi bi-repeat"></i></a>
+
+                                    <a class="color-purple bi-hover-bold transection-actionById-btn" 
+                                        asp-area=""
+                                        asp-controller="Transection"
+                                        asp-action="CancelBorrowBook"
+                                        data-id="@item.Id" 
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="right" 
+                                        title="Cancel">
+                                    <i class="bi bi-x-square"></i></a>
+
+                                    <a class="color-purple bi-hover-bold transection-actionById-btn claimLost-btn"
+                                        asp-area="" 
+                                        asp-controller="Transection"
+                                        asp-action="ClaimLostBorrowBook" 
+                                        data-id="@item.Id" 
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="right"
+                                        title="Claim Lost">
+                                    <i class="bi bi-bookmark-x"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAuthor)</b> :
+                                @Html.DisplayFor(model => item.BookAuthor)
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BorrowDate)</b> :
+                                @item.BorrowDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.DueDate)</b> :
+                                @item.DueDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.HasPenalty)</b> :
+                                @if (item.HasPenalty == true)
+                                {
+                                    <i class="bi bi-check2 color-purple"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-lg color-purple"></i>
+                                }
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.RenewDate)</b> :
+                                @(item.RenewDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.RenewCount)</b> :
+                                @Html.DisplayFor(model => item.RenewCount)
+                                @if (!item.CanRenewBook)
+                                {
+                                    <i class="bi bi-info-circle text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="right" title="You reach to the renew limit now can't renew this book just return it."></i>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAvailableCopies)</b> :
+                                @Html.DisplayFor(model => item.BookAvailableCopies)
+                            </div>
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookTotalCopies)</b> :
+                                @Html.DisplayFor(model => item.BookTotalCopies)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (Model.Data1.Any())
+        {
+            <div class="color-purple d-flex align-items-center mt-2">
+                <h3 class="mb-0 me-2">Past Check-out Books</h3>
+                <hr class="flex-grow-1" />
+                <div>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn prev" data-bs-toggle="tooltip" data-bs-placement="right" title="Previous">
+                        <i class="fa fa-angle-left fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                    <a href="" class="btn color-purple fw-bold height-fit-content mx-1 px-1 border-0 pagination-btn next" data-bs-toggle="tooltip" data-bs-placement="right" title="Next">
+                        <i class="fa fa-angle-right fs-1 px-2" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            @foreach (var item in Model.Data1)
+            {
+                <div class="row bg-white m-3 p-3 card-container">
+                    <div class="col-md-2 d-flex justify-content-center p-0">
+                        <img src="@item.BookCoverPage" alt="Book" class="w-100 book-image" height="150" />
+                    </div>
+                    <div class="col-md-10">
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                            <div class="d-flex gap-1 align-content-center">
+                                <div class="book-icon">
+                                    <img src="@item.BookCoverPage" alt="Book" width="30" height="30" class="rounded-circle border-dark border-1 mx-1" />
+                                </div>
+                                <h4 class="color-purple" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.StatusLabel">
+                                    @Html.DisplayFor(model => item.BookName)
+                                    <span class="status-dot" style="--textcolor:@item.StatusLabelColor;"></span>
+                                </h4>
+                            </div>
+                            <div class="section-options">
+                                
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAuthor)</b> :
+                                @Html.DisplayFor(model => item.BookAuthor)
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BorrowDate)</b> :
+                                @item.BorrowDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.DueDate)</b> :
+                                @item.DueDate.DateTime.ToString("dd-MM-yyyy hh:mm tt")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.ReturnDate)</b> :
+                                @(item.ReturnDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.RenewDate)</b> :
+                                @(item.RenewDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                            <div class="col-md section-col">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.LostClaimDate)</b> :
+                                @(item.LostClaimDate?.DateTime.ToString("dd-MM-yyyy hh:mm tt") ?? "-")
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookAvailableCopies)</b> :
+                                @Html.DisplayFor(model => item.BookAvailableCopies)
+                            </div>
+                            <div class="col-md-4">
+                                <b class="color-purple">@Html.DisplayNameFor(model => item.BookTotalCopies)</b> :
+                                @Html.DisplayFor(model => item.BookTotalCopies)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_NotFoundPartial");
+    }
+</div>
+<div id="transectionContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        updatePaginationBtnStatus();
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
+
+        if (successToastMessage)
+        {
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
+        }
+
+        var lastDateLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => (m.DueDate.Date - DateTimeOffset.UtcNow.Date).Days <= 2)));
+        var renewLimitLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => m.CanRenewBook)));
+        var activeStatusLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => !new[] { nameof(TransectionStatusEnum.Cancelled), nameof(TransectionStatusEnum.Returned), nameof(TransectionStatusEnum.ClaimedLost) }.Contains(m.StatusLabel))));
+
+        $(".renew-btn").each(function ()
+        {
+            var id = $(this).data("id");
+            var isLastDate = lastDateLookup[id];
+            var canRenew = renewLimitLookup[id];
+
+            if (!isLastDate)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to Due date is far from today")
+                    .removeAttr("data-id");
+            }
+            else if(!canRenew)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to You reach to renew limit now can't renew it")
+                    .removeAttr("data-id");
+            }
+        });
+
+        $(".claimLost-btn").each(function ()
+        {
+            var id = $(this).data("id");
+            var isActiveDate = activeStatusLookup[id];
+
+            if (!isActiveDate)
+            {
+                $(this).addClass("btn-submit-disabled")
+                    .attr("title", "Disabled due to transaction is not active")
+                    .removeAttr("data-id");
+            }
+        });
+
+        $(".pagination-btn").off("click").on("click", function (e)
+        {
+            e.preventDefault();
+            let currentPage = @Model.Pagination.PageNumber;
+
+            if ($(this).hasClass("disabled")) return;
+            else if ($(this).hasClass("prev") && currentPage > 1) currentPage--;
+            else if ($(this).hasClass("next") && currentPage < @Model.Pagination.PageCount) currentPage++;
+
+            updatePaginationBtnStatus();
+            callApiWithFilter(currentPage);
+        });
+
+        $('.transection-details-table .transection-actionById-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            let id = $(this).data("id");
+
+            if (id !== undefined)
+            {
+                var message = "Are you sure you want to continue with this action?";
+                setProceedButtonHref(this, message, "id=" + id);
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+    });
+
+    function updatePaginationBtnStatus()
+    {
+        $(".pagination-btn").removeClass("btn-submit-disabled");
+        $(".pagination-btn").removeClass("btn-submit-disabled-border");
+        if (@Model.Pagination.PageNumber === 1)
+            toggleButtonState('.pagination-btn.prev', true, 'bg-color-purple text-light');
+
+        if (@Model.Pagination.PageNumber === @Model.Pagination.PageCount)
+            toggleButtonState('.pagination-btn.next', true, 'bg-color-purple text-light');
+    }
+
+    function callApiWithFilter(pageNumber)
+    {
+        let currentUrl = window.location.href;
+        const url = new URL(currentUrl);
+
+        url.searchParams.set("pageNumber", pageNumber);
+
+        if (pageNumber !== undefined)
+            window.location.href = url;
+    }
+</script>

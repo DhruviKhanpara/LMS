@@ -1,0 +1,68 @@
+﻿@model LMS.Application.Contracts.DTOs.Transection.GetTransectionDto
+
+@{
+    ViewData["Id"] = "getTransectionModal";
+    ViewData["ModelTitle"] = "Transaction Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+@if (Model.HasPenalty == true)
+{
+    <div class="mb-2 py-1 fs-6 status-clip dynamic-style"
+         style="--bgcolor:#DC354529; --textcolor:#DC3545;">
+        Have unpaid penalty
+    </div>
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.UserName)</b> : 
+            <img src="@Model.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(model => model.UserName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.BookName)</b> : 
+            @Html.DisplayFor(model => model.BookName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.BorrowDate)</b> : 
+            @Model.BorrowDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.RenewCount)</b> :
+            @Html.DisplayFor(model => model.RenewCount)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.RenewDate)</b> :
+            @(Model.RenewDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.DueDate)</b> : 
+            @Model.DueDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item status-field" style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+            <b>@Html.DisplayNameFor(model => model.StatusLabel)</b> :
+            <span class="status-dot"></span>
+            <span class="status-text">@Html.DisplayFor(model => model.StatusLabel)</span>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.ReturnDate)</b> : 
+            @(Model.ReturnDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.LostClaimDate)</b> :
+            @(Model.LostClaimDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getTransectionModal').length && $('#getTransectionModal').is(':hidden'))
+        {
+            $('#getTransectionModal').modal('show');
+        }
+    });
+</script>

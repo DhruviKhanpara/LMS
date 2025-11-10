@@ -1,0 +1,71 @@
+﻿@model LMS.Application.Contracts.DTOs.UserMembershipMapping.GetUserMembersipListDto
+
+@{
+    ViewData["Id"] = "getUserMembershipModal";
+    ViewData["ModelTitle"] = "User membership Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.UserName)</b> :
+            @Html.DisplayFor(model => model.UserName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.MembershipType)</b> :
+            @Html.DisplayFor(model => model.MembershipType)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.MembershipDescription)</b> :
+            @Html.DisplayFor(model => model.MembershipDescription)
+        </li>
+        <li class="list-group-item status-field" style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+            <b>@Html.DisplayNameFor(model => model.StatusLabel)</b> :
+            <span class="status-dot"></span>
+            <span class="status-text">@Html.DisplayFor(model => model.StatusLabel)</span>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.EffectiveStartDate)</b> :
+            @(Model.EffectiveStartDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.ExpirationDate)</b> :
+            @Model.ExpirationDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.BorrowLimit)</b> :
+            @Html.DisplayFor(model => model.BorrowLimit) at a time
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.ReservationLimit)</b> :
+            @Html.DisplayFor(model => model.ReservationLimit) can do at a time
+        </li>
+        <li class="list-group-item">
+            <b>Membership Cost</b> :
+            @(Model.PaidAmount + Model.Discount)
+            <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Discount)</b> :
+            @Html.DisplayFor(model => model.Discount)
+            <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.PaidAmount)</b> :
+            @Html.DisplayFor(model => model.PaidAmount)
+            <i class="fa fa-inr" aria-hidden="true"></i>
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getUserMembershipModal').length && $('#getUserMembershipModal').is(':hidden'))
+        {
+            $('#getUserMembershipModal').modal('show');
+        }
+    });
+</script>

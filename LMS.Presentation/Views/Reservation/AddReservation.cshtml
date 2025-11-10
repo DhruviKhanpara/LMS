@@ -1,0 +1,191 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Reservation.AddReservationDto
+
+@{
+    ViewData["Id"] = "addReservationModel";
+    ViewData["ModelTitle"] = "Add Reservation";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .add-reservation-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<form asp-action="AddReservation" class="needs-validation" id="addReservationForm" method="post">
+    <div class="d-flex justify-content-end gap-3 mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" id="IsAllocated" type="checkbox" asp-for="IsAllocated">
+            <label class="form-check-label" asp-for="IsAllocated">Is Allocated</label>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6 add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <select id="add-reservation-form-userId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.Users"
+                        asp-for="UserId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="UserId" class="did-floating-label">User</label>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6 add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <select id="add-reservation-form-bookId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.Books"
+                        asp-for="BookId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="BookId" class="did-floating-label">Book</label>
+                <span asp-validation-for="BookId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="ReservationDate" type="datetime-local" class="did-floating-input" id="reservationDate" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="ReservationDate" class="did-floating-label">Reservation Date<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="ReservationDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="AllocateAfter" type="datetime-local" class="did-floating-input" id="allocateAfter" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="AllocateAfter" class="did-floating-label">Allocate After</label>
+                <span asp-validation-for="AllocateAfter" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <select id="add-reservation-form-statusId"
+                        class="did-floating-select select2-single"
+                        asp-items="@Model.ReservationStatusList"
+                        asp-for="StatusId"
+                        onclick="this.setAttribute('value', this.value);"
+                        onchange="this.setAttribute('value', this.value);"
+                        value="">
+                    <option value=""></option>
+                </select>
+                <label asp-for="StatusId" class="did-floating-label">Status</label>
+                <span asp-validation-for="StatusId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6 add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="AllocatedAt" type="datetime-local" class="did-floating-input" id="allocateDate" placeholder="" />
+                <label asp-for="AllocatedAt" class="did-floating-label">Allocate Date</label>
+                <span asp-validation-for="AllocatedAt" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md add-reservation-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="CancelDate" type="datetime-local" class="did-floating-input" id="cancelDate" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                <label asp-for="CancelDate" class="did-floating-label">Cancel Date</label>
+                <span asp-validation-for="CancelDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="CancelReason" class="did-floating-textarea" rows="2" placeholder="" id="cancleReason"></textarea>
+            <label asp-for="CancelReason" class="did-floating-label">Cancle Reason</label>
+            <span asp-validation-for="CancelReason" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="add-reservation-btn">Add Reservation</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#addReservationForm #add-reservation-form-userId');
+        removeSingleDropdownValueAttr('#addReservationForm #add-reservation-form-bookId');
+        removeSingleDropdownValueAttr('#addReservationForm #add-reservation-form-statusId');
+
+        readonlyField("#addReservationForm #IsAllocated");
+        toggleCancleControlls('#add-reservation-form-statusId');
+
+        if ($('#addReservationModel').length && $('#addReservationModel').is(':hidden'))
+        {
+            $('#addReservationModel').modal('show');
+        }
+
+        $("#add-reservation-form-statusId").on("change", function () 
+        { 
+            toggleAllocateDate(this); 
+            toggleCancleControlls(this);
+        });
+
+        $("#reservationDate").off("change").on("change", function () { validateDates(this); });
+        $("#allocateAfter").off("change").on("change", function () { validateDates(this); });
+        $("#allocateDate").off("change").on("change", function () { validateDates(this); });
+        $("#cancelDate").off("change").on("change", function () { validateDates(this); });
+    });
+
+    $(document).off("submit", "#addReservationForm").on("submit", "#addReservationForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-reservation-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("IsAllocated", false);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addReservationModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-reservation-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-reservation-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,322 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Books.GetBookInfoDto
+
+@{
+    ViewData["Id"] = "getBookInfoModal";
+    ViewData["ModelTitle"] = "Book Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+
+    var coverPage = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.CoverPage), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+
+    var bookPreview = Model.BookFiles.Where(x => x.Label.Equals(nameof(BookFileTypeEnum.BookPreview), comparisonType: StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+
+    var availableStatus = nameof(BookStatusEnum.Available);
+}
+
+<style>
+    .marquee-wrapper {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .marquee-content {
+        display: inline-block;
+        white-space: nowrap;
+        padding-left: 100%;
+        animation: marquee 20s linear infinite;
+    }
+
+    @@keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+
+    @@media (min-width: 500px) {
+        .book-info-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/filesetting.js" asp-append-version="true"></script>
+
+<div class="row my-2 overflow-hidden">
+    <div class="mb-2 py-1 fs-6 status-clip @(Model.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+         style="--bgcolor:@Model.StatusLabelBgColor; --textcolor:@Model.StatusLabelColor;">
+        @Html.DisplayFor(modelItem => Model.StatusLabel)
+    </div>
+    @if (Model.canBorrow != true || Model.canReserve != true || Model.IsBorrowed == true || Model.IsReserved == true || Model.StatusLabel != BookStatusEnum.Available.ToString())
+    {
+        <div class="marquee-wrapper">
+            <div class="mb-1 py-1 fs-6 text-center text-danger marquee-content">
+                @if (!Model.canBorrow.HasValue && !Model.canReserve.HasValue)
+                {
+                    @: | You haven't any active plan for borrow or reservation.
+                }
+                @if (Model.canBorrow == false)
+                {
+                    @: | Your Borrow limit is over now you can't borrow new book.
+                }
+                @if (Model.canReserve == false)
+                {
+                    @: | Your Reservation limit is over now you can't reserve new book.
+                }
+                @if (Model.StatusLabel != BookStatusEnum.Available.ToString())
+                {
+                    @: | Book is not available to all user for borrow.
+                }
+                @if (Model.IsBorrowed == true)
+                {
+                    @: | You already borrow this book.
+                }
+                @if (Model.IsReserved == true)
+                {
+                    @: | You already reserved this book.
+                }
+            </div>
+        </div>
+    }
+    @if (coverPage is not null || bookPreview is not null)
+    {
+        <div class="col-sm-4 text-center mt-1">
+            <div class="d-flex align-content-center flex-wrap justify-content-center gap-2">
+                @if (coverPage is not null)
+                {
+                    <img src="@coverPage.fileLocation" class="img-thumbnail" width="150" alt="Cover page" data-bs-toggle="tooltip" data-bs-placement="right" title="Cover page" onclick="showDocumentModal('@coverPage.fileLocation')" />
+                }
+            </div>
+            @if (bookPreview is not null)
+            {
+                <div class="text-link color-purple pt-2" onclick="showDocumentModal('@bookPreview.fileLocation')">Book Preview</div>
+            }
+        </div>
+    }
+    <div class="col-sm-8 pb-2">
+        <h2 class="color-purple">@Html.DisplayFor(model => model.Title)</h2>
+        <p>@Html.DisplayFor(model => model.Author)</p>
+        <div class="d-flex flex-row gap-2 my-3">
+            <a class="btn btn-submit color-purple" id="book-borrow-btn" asp-area="" asp-controller="Transection" asp-action="BorrowBookForLogin" data-item-id="@Model.Id">Borrow Book</a>
+            <a class="btn btn-submit color-purple" id="book-reserve-btn" asp-area="" asp-controller="Reservation" asp-action="ReserveBookForLogin" data-item-id="@Model.Id">Reserve Book</a>
+        </div>
+        @if (Model.IsAllocated == true)
+        {
+            <div class="d-flex my-3 gap-2" style="--textcolor:#20C997;">
+                <h5 class="">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Allocated to you</span>
+                </h5>
+                <hr class="flex-grow-1" />
+                <a class="py-1 fs-6 text-decoration-none fw-bold color-purple" asp-area="" asp-controller="Reservation" asp-action="GetUserReservations">Check <i class="bi bi-arrow-right"></i></a>
+            </div>
+        }
+    </div>
+</div>
+<div class="row my-2">
+    <h3 class="py-2 color-purple">Description</h3>
+    <div class="col-md book-info-col">
+        <div class="description-container text-justify">
+            <span class="description">
+                @Html.DisplayFor(model => model.BookDescription)
+            </span>
+            <span class="toggle-more text-link color-purple">Read more</span>
+        </div>
+    </div>
+</div>
+<div class="row my-2">
+    <h3 class="py-2 color-purple">Author</h3>
+    <div class="d-flex flex-row gap-2 align-items-center">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s" alt="Author" width="50" height="50" class="rounded-circle border-dark border-1">
+        <h5>@Html.DisplayFor(model => model.Author)</h5>
+    </div>
+    <div class="col-sm-1">
+        
+    </div>
+    <div class="col-sm-11">
+        <div class="description-container text-justify">
+            <span class="description">
+                @Html.DisplayFor(model => model.AuthorDescription)
+            </span>
+            <span class="toggle-more text-link color-purple">Read more</span>
+        </div>
+    </div>
+</div>
+<div class="row my-2">
+    <h3 class="color-purple py-2">This Edition</h3>
+    <div class="col-md pb-3 book-info-col">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.GenreName)</b> : 
+                @Html.DisplayFor(model => model.GenreName)
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.Isbn)</b> : 
+                @Html.DisplayFor(model => model.Isbn)
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.Author)</b> : 
+                @Html.DisplayFor(model => model.Author)
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.Publisher)</b> : 
+                @Html.DisplayFor(model => model.Publisher)
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.PublishAt)</b> : 
+                @Model.PublishAt?.ToString("dd/MM/yyyy")
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.Price)</b> : 
+                @Html.DisplayFor(model => model.Price) <i class="fa fa-inr" aria-hidden="true"></i>
+            </li>
+        </ul>
+    </div>
+    <div class="col-md pb-3 book-info-col">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.TotalCopies)</b> : 
+                @Html.DisplayFor(model => model.TotalCopies)    
+            </li>
+            <li class="list-group-item">
+                <b>@Html.DisplayNameFor(model => model.AvailableCopies)</b> : 
+                @Html.DisplayFor(model => model.AvailableCopies) / @Html.DisplayFor(model => model.TotalCopies) (Total)
+            </li>
+            <li class="list-group-item">
+                <b>Total Borrowing</b> : 
+                @Html.DisplayFor(model => model.TotalBorrowing)    
+            </li>
+            <li class="list-group-item">
+                <b>Total Reservation</b> : 
+                @Html.DisplayFor(model => model.TotalReservation)    
+            </li>
+            <li class="list-group-item">
+                <b>Active Reservation</b> : 
+                @Html.DisplayFor(model => model.ActiveReservation)
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row my-2">
+    <div class="col-md">
+        <h3 class="py-2 color-purple">Recent activity by other users</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center" scope="col">#</th>
+                        <th class="px-4" scope="col">User</th>
+                        <th scope="col">Activity</th>
+                        <th scope="col">Activity Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentActivitiesByPeople != null && Model.RecentActivitiesByPeople.Any())
+                    {
+                        @foreach (var item in Model.RecentActivitiesByPeople.Select((activity, index) => new { activity, index }))
+                        {
+                            <tr>
+                                <th class="text-center" scope="row">@(item.index + 1)</th>
+                                <td><img src="@item.activity.profilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-3" />@item.activity.Username</td>
+                                <td>@item.activity.Activity</td>
+                                <td>@item.activity.ActivityDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center border-0">No records found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getBookInfoModal').length && $('#getBookInfoModal').is(':hidden'))
+        {
+            $('#getBookInfoModal').modal('show');
+        }
+
+        $("#book-borrow-btn").removeClass("btn-submit-disabled");
+        $("#book-borrow-btn").removeClass("btn-submit-disabled-border");
+        $("#book-reserve-btn").removeClass("btn-submit-disabled");
+        $("#book-reserve-btn").removeClass("btn-submit-disabled-border");
+
+        var canBorrow = @Html.Raw(Json.Serialize(Model.canBorrow));
+        var canReserve = @Html.Raw(Json.Serialize(Model.canReserve));
+        var isReserve = @Html.Raw(Json.Serialize(Model.IsReserved));
+        var isBorrow = @Html.Raw(Json.Serialize(Model.IsBorrowed));
+        var isAllocated = @Html.Raw(Json.Serialize(Model.IsAllocated));
+
+        if (canBorrow === null || canBorrow === false || isBorrow == true || (canBorrow === true && isAllocated === false && @Model.StatusLabel.ToLower() != @availableStatus.ToLower()))
+        {
+            toggleButtonState('#book-borrow-btn', true, 'bg-color-purple text-light');
+        }
+        else
+        {
+            $('#book-borrow-btn').off("click").on("click", function (event)
+            {
+                event.preventDefault();
+                toggleButtonState('#book-borrow-btn', true, 'color-purple btn-submit');
+
+                var message = "Are you sure you want to borrow this book?";
+                var bookId = $(this).data("item-id");
+                setProceedButtonHref(this, message, "bookId=" + bookId);
+
+                toggleButtonState('#book-borrow-btn', false, 'color-purple btn-submit');
+            });
+        }
+
+        if (canReserve === null || canReserve === false || isReserve == true || isBorrow == true)
+        {
+            toggleButtonState('#book-reserve-btn', true, 'bg-color-purple text-light');
+        }
+        else
+        {
+            $('#book-reserve-btn').off("click").on("click", function (event)
+            {
+                event.preventDefault();
+                toggleButtonState('#book-reserve-btn', true, 'color-purple btn-submit');
+
+                var message = "Are you sure you want to reserve this book?";
+                var bookId = $(this).data("item-id");
+                setProceedButtonHref(this, message, "bookId=" + bookId);
+
+                toggleButtonState('#book-reserve-btn', false, 'color-purple btn-submit');
+            });
+        }
+
+        const maxDescriptionLength = 250;
+        $(".description-container").each(function ()
+        {
+            const $description = $(this).find(".description");
+            const $toggleButton = $(this).find(".toggle-more");
+
+            const fullDescription = $description.text().trim() || "";
+
+            initializeDescription($description, $toggleButton, fullDescription, maxDescriptionLength);
+        });
+    });
+
+    $('#transparentModal, #confirmationModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#getBookInfoModal').css('z-index', 1051);
+    });
+
+    $('#transparentModal, #confirmationModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#getBookInfoModal').css('z-index', 1050);
+    });
+</script>

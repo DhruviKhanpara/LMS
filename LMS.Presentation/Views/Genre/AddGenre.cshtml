@@ -1,0 +1,80 @@
+﻿@model LMS.Application.Contracts.DTOs.Genre.AddGenreDto
+
+@{
+    ViewData["Id"] = "addGenreModel";
+    ViewData["ModelTitle"] = "Add Genre";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<form asp-action="AddGenre" class="needs-validation" id="addGenreForm" method="post">
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="Name" class="did-floating-input" placeholder="" />
+            <label asp-for="Name" class="did-floating-label">Name<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="Description" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="Description" class="did-floating-label">Genre Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="add-genre-btn">Add Genre</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#addGenreModel').length && $('#addGenreModel').is(':hidden'))
+        {
+            $('#addGenreModel').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#addGenreForm").on("submit", "#addGenreForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#add-genre-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#addGenreModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#add-genre-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#add-genre-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

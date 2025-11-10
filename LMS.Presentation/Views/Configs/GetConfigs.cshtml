@@ -1,0 +1,174 @@
+﻿@using LMS.Presentation.HTMLHelper;
+@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Configs.GetConfigsDto>
+
+@{
+    ViewData["Title"] = "GetConfigs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+<script src="~/js/sorting.js" asp-append-version="true"></script>
+@Html.Heading("Genre Information")
+<div class="container-fluid my-1">
+    <div class="d-flex justify-content-end px-3 my-3 gap-3">
+        <div>
+            <a asp-area="" asp-controller="Configs" asp-action="GetExportConfigs" class="btn btn-submit color-purple">Export Configs</a>
+        </div>
+        @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin)))
+        {
+            <script src="~/js/filterSelector.js" asp-append-version="true"></script>
+
+            <div class="did-floating-label-content m-0 w-15">
+                <select class="did-floating-select select2-single filter-options" data-params="activeData" id="data-selection-option" value="">
+                    <option value="">Removed and Active Data</option>
+                    <option value="true">Active Data</option>
+                    <option value="false">Removed Data</option>
+                </select>
+            </div>
+        }
+    </div>
+    <div class="table-responsive scrollable-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="sortable-header" data-field="KeyName">Key Name</th>
+                    <th class="sortable-header text-center" data-field="KeyValue">Key Value</th>
+                    <th class="sortable-header text-center" data-field="Description">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Data is not null && Model.Data.Any())
+                {
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="@(item.IsRemoved ? "bg-color-danger" : "bg-color-default")">
+                            <td>
+                                <div class="d-flex justify-content-between gap-3 configs-details-table">
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin)))
+                                    {
+                                        @if (!item.IsRemoved)
+                                        {
+                                            <a class="color-purple bi-hover-bold configs-actionById-btn" 
+                                                asp-area="" 
+                                                asp-controller="Configs" 
+                                                asp-action="GetConfigsDetailById" 
+                                                data-configs-id="@item.Id" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="right" 
+                                                title="Detail">
+                                            <i class="bi bi-exclamation-circle"></i></a>
+
+                                            <a class="color-purple bi-hover-bold configs-actionById-btn" 
+                                                asp-area="" 
+                                                asp-controller="Configs" 
+                                                asp-action="UpdateConfig" 
+                                                data-configs-id="@item.Id" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="right" 
+                                                title="Edit">
+                                            <i class="bi bi-pencil-square"></i></a>
+                                        }
+
+                                        <a class="color-purple bi-hover-bold configs-actionById-btn"
+                                            asp-area="" 
+                                            asp-controller="Log"
+                                            asp-action="GetConfigsAuditHistoryByConfigId"
+                                            data-configs-id="@item.Id" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="right" 
+                                            title="History">
+                                        <i class="bi bi-clock-history"></i></a>
+                                        
+
+                                        @if (item.IsRemoved)
+                                        {
+                                            @* restore *@
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.KeyName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.KeyValue)
+                            </td>
+                            <td class="truncate-description-container" data-max-length="130" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.Description">
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center border-0">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @{
+        await Html.RenderPartialAsync("_PaginationPartial", Model.Pagination);
+    }
+</div>
+
+<div id="configsContainer"></div>
+<div id="confirmationModalContainer">
+    @await Html.PartialAsync("_ConfirmationBoxModelPartial")
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
+
+        if (successToastMessage)
+        {
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
+        }
+
+        $('.configs-details-table .configs-actionById-btn').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            var configsId = $(this).data('configs-id');
+
+            if (configsId !== undefined)
+            {
+                $.ajax({
+                    url: $(this).attr("href"),
+                    data: { id: configsId },
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (result)
+                    {
+                        $('#configsContainer').html(result);
+                    }
+                });
+            }
+
+            $(this).removeClass("btn-submit-disabled");
+        });
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,79 @@
+﻿body {
+    background-color: #e8e1f3;
+}
+
+.login-container {
+    max-width: 1290px;
+    min-height: 80vh;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: auto;
+}
+
+.left-section {
+    flex: 1;
+    background: url('../../../assets/Images/library-image.png') center no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.right-section {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-title {
+    font-weight: bold;
+}
+
+@media (max-width: 992px) {
+    .left-section {
+        flex: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .login-container {
+        flex-direction: column;
+        min-height: auto;
+        max-width: 870px;
+    }
+    .register-col {
+        flex: 1 0 0%;
+    }
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        font-size: 14px;
+        max-width: 460px;
+    }
+
+    .register-col {
+        flex: auto;
+    }
+
+    .right-section {
+        padding: 15px;
+    }
+
+    .login-title {
+        font-size: 22px;
+    }
+
+    .btn-submit {
+        font-size: 14px;
+        padding: 10px;
+    }
+}

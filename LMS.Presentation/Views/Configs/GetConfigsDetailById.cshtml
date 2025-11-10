@@ -1,0 +1,35 @@
+﻿@model LMS.Application.Contracts.DTOs.Configs.GetConfigsDto
+
+@{
+    ViewData["Id"] = "getConfigsModal";
+    ViewData["ModelTitle"] = "Config Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.KeyName)</b> :
+            @Html.DisplayFor(model => model.KeyName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.KeyValue)</b> :
+            @Html.DisplayFor(model => model.KeyValue)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Description)</b> :
+            @Html.DisplayFor(model => model.Description)
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getConfigsModal').length && $('#getConfigsModal').is(':hidden'))
+        {
+            $('#getConfigsModal').modal('show');
+        }
+    });
+</script>

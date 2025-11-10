@@ -1,0 +1,92 @@
+﻿@using LMS.Core.Enums;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Library Management System</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/splidejs/css/splide.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/toastr.js/toastr.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/floating-lables.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/select2-custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/LMS.Presentation.styles.css" asp-append-version="true" />
+
+    <!-- JavaScript -->
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/lib/select2/js/select2.min.js" asp-append-version="true"></script>
+    <script src="~/lib/splidejs/js/splide.min.js" asp-append-version="true"></script>
+    <script src="~/lib/toastr.js/toastr.min.js" asp-append-version="true"></script>
+	<script src="~/lib/Chart.js/chart.umd.min.js" asp-append-version="true"></script>
+    <script src="~/lib/chartjs-plugin-datalabels/chartjs-plugin-datalabels.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/select2-custom.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</head>
+<body>
+    <div class="wrapper d-flex">
+        @if (User.Identity.IsAuthenticated)
+        {
+            await Html.RenderPartialAsync("_SidebarPartial");
+        }
+
+        <div class="main-content d-flex flex-column vh-100">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><b>Library Management</b></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            @if (!User.Identity.IsAuthenticated || (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.User))))
+                            {   
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Membership" asp-action="Plan">Membership</a>
+                                </li>
+                            }
+                            @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Librarian)))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Penalty" asp-action="GetUserPenalty">My Penalty</a>
+                                </li>
+                            }
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="User" asp-action="Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="User" asp-action="Registration">SignUp</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4 flex-grow-1">
+                @RenderBody()
+            </div>
+
+            <footer class="footer text-center bg-light p-3">
+                &copy; 2025 - Library Management System - Privacy
+            </footer>
+        </div>
+    </div>
+
+    @await Component.InvokeAsync("NToastNotify")
+</body>
+</html>

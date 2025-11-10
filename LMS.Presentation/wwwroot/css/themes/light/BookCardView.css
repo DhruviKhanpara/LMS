@@ -1,0 +1,33 @@
+﻿.book-card {
+    width: 12em;
+    background-color: #fff;
+    padding: 1em;
+    box-shadow: 0 5px 5px #e1e1e1;
+    font-family: Arial, Helvetica, sans-serif;
+    transition: ease-in-out 0.3s;
+    border-radius: 5px;
+}
+
+.book-card:hover {
+    transform: scale(1.1, 1.1);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(90, 45, 130, 0.3);
+}
+
+@media screen and (max-width: 650px) {
+    .book-card {
+        width: 11em;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .book-card {
+        width: 15em;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .book-card {
+        width: 100%;
+    }
+}

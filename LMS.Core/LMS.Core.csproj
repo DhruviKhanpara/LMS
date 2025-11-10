@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="Enums\FineStatusEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FineStatusEnum.cs</LastGenOutput>
+    </None>
+    <None Update="Enums\PenaltyTypeEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PenaltyTypeEnum.cs</LastGenOutput>
+    </None>
+    <None Update="Enums\ReservationsStatusEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ReservationsStatusEnum.cs</LastGenOutput>
+    </None>
+    <None Update="Enums\RoleListEnum.tt">
+      <LastGenOutput>RoleListEnum.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Enums\BookStatusEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BookStatusEnum.cs</LastGenOutput>
+    </None>
+    <None Update="Enums\StatusTypeEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>StatusTypeEnum.cs</LastGenOutput>
+    </None>
+    <None Update="Enums\TransectionStatusEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TransectionStatusEnum.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Enums\BookStatusEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BookStatusEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\FineStatusEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FineStatusEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\PenaltyTypeEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PenaltyTypeEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\ReservationsStatusEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReservationsStatusEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\RoleListEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RoleListEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\StatusTypeEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>StatusTypeEnum.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Enums\TransectionStatusEnum.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TransectionStatusEnum.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+</Project>

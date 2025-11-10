@@ -1,0 +1,86 @@
+﻿<#@ template debug="true" hostSpecific="true" language="C#" #>
+<#@ Assembly Name="EnvDTE.dll" #>
+<#@ Assembly Name="System.Data" #>
+<#@ Assembly Name="System.Core" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#
+    string connectionString = "server=DESKTOP-FHUN18Q;Database=LibraryManagementSys;Trusted_Connection=True;TrustServerCertificate=True;";
+ 
+    var templateFile = Path.GetDirectoryName(this.Host.TemplateFile);
+    IServiceProvider serviceProvider = (IServiceProvider)this.Host;
+    DTE dte = (DTE)serviceProvider.GetService(typeof(DTE));
+    Project project = dte.Solution.FindProjectItem(templateFile).ContainingProject;
+#>
+using System.CodeDom.Compiler;
+using System.ComponentModel.DataAnnotations;
+ 
+namespace LMS.Core.Enums;
+
+/// <summary>
+/// <#= tableName #> auto generated enumeration
+/// </summary>
+[GeneratedCode("TextTemplatingFileGenerator", "10")]
+public enum <#= className #><# if (!string.IsNullOrEmpty(underlyingType)) { #> : <#= underlyingType #><# } #>
+
+{
+<#
+    using (SqlConnection conn = new SqlConnection(connectionString))
+    {
+    
+    string command = string.Format("SELECT {0}, {1}, {2} FROM {3} {4}", columnId, columnDescription, columnTypeCode, tableName, filterCondition);
+    System.Diagnostics.Debug.WriteLine(command);
+    SqlCommand comm = new SqlCommand(command, conn);
+ 
+    conn.Open();
+ 
+    SqlDataReader reader = comm.ExecuteReader();
+    bool loop = reader.Read();
+ 
+while(loop)
+{
+#>
+    [Display(Name = "<#= MakeSafeForString(reader[columnTypeCode]) #>", Description = "<#= MakeSafeForString(reader[columnDescription]) #>")]
+    <#= CreateName(reader[columnTypeCode]) #> = <#= reader[columnId] #><# loop = reader.Read(); #><#= loop ? ",\r\n" : string.Empty #>
+<#
+}
+    conn.Close();
+}
+#>
+}
+
+<#+
+    private string MakeSafeForString(object value)
+    {
+        Regex rx = new Regex(@"[^a-zA-Z0-9 \(\)\/-]");
+        return rx.Replace(value.ToString(), "");
+    }
+
+    private string CreateName(object value)
+    {
+        Regex rx = new Regex(@"[^a-zA-Z0-9 \(\)\/_]");
+        string typeCode = rx.Replace(value.ToString(), "");
+        bool isDigit = char.IsDigit(typeCode[0]);
+        if(isDigit)
+        {
+            return "T" + typeCode;
+        }
+        else
+        {
+            return FirstLetterToUpperCase(typeCode);
+        }
+    }
+
+    public string FirstLetterToUpperCase(string s)
+    {
+        if (string.IsNullOrEmpty(s))
+            throw new ArgumentException("There is no first letter");
+
+        char[] a = s.ToCharArray();
+        a[0] = char.ToUpper(a[0]);
+        return new string(a);
+    }
+#>

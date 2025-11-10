@@ -1,0 +1,71 @@
+﻿@using LMS.Presentation.HTMLHelper;
+
+@model IEnumerable<LMS.Application.Contracts.DTOs.UserMembershipMapping.GetUserMembersipListDto>
+
+@{
+    ViewData["Title"] = "GetLoginUserMembership";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/themes/light/pricingcardview.css" asp-append-version="true" />
+
+@Html.Heading("My Membership Section")
+<div class="content">
+    <div class="mt-3 pb-2 fs-5 d-flex justify-content-center align-content-center">
+        <a class="text-link color-purple" asp-area="" asp-controller="Configs" asp-action="GetIntructions">Check rules for Membership purchase</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="color-purple d-flex align-items-center mt-2">
+            <h3 class="mb-0 me-2">User membership</h3>
+            <hr class="flex-grow-1" />
+            <a class="btn btn-submit color-purple mx-2" asp-area="" asp-controller="Membership" asp-action="Plan">New Membership</a>
+        </div>
+
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-3 pricing-card-holder">
+                        <div class="pricing-card">
+                            <span class="badge bg-color-purple">@Html.DisplayFor(modelItem => item.MembershipType)</span>
+                            <div class="status-clip px-2 @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                 style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                @Html.DisplayFor(modelItem => item.StatusLabel)
+                            </div>
+                            <h2 class="price color-purple">
+                                <i class="fa fa-inr" aria-hidden="true"></i>
+                                @Html.DisplayFor(modelItem => item.PaidAmount)
+                                <span>/ per plan</span>
+                            </h2>
+                            <div class="color-gray text-justify mb-2 truncate-description-container" data-max-length="100" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.MembershipDescription">@Html.DisplayFor(modelItem => item.MembershipDescription)</div>
+                            <ul>
+                                <li>
+                                    <b>@Html.DisplayNameFor(modelItem => item.BorrowLimit) :</b>
+                                    @Html.DisplayFor(modelItem => item.BorrowLimit) books at a time
+                                </li>
+                                <li>
+                                    <b>@Html.DisplayNameFor(modelItem => item.ReservationLimit) :</b>
+                                    @Html.DisplayFor(modelItem => item.ReservationLimit) books at a time
+                                </li>
+                                <li>
+                                    <b>From</b> @item.EffectiveStartDate.Date.ToString("dd/MM/yyyy")
+                                    <b>To</b> @item.ExpirationDate.Date.ToString("dd/MM/yyyy")
+                                </li>
+                                <li>
+                                    <b>@Html.DisplayNameFor(modelItem => item.Discount) :</b>
+                                    @Html.DisplayFor(modelItem => item.Discount)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_NotFoundPartial");
+    }
+</div>

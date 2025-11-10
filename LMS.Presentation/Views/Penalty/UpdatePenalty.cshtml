@@ -1,0 +1,346 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.Penalty.UpdatePenaltyDto
+
+@{
+    ViewData["Id"] = "updatePenaltyModel";
+    ViewData["ModelTitle"] = "Update Penalty";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+
+    var isUnpaid = Model.StatusId == (long)FineStatusEnum.UnPaid;
+    var claimedLostStatus = TransectionStatusEnum.ClaimedLost.ToString();
+    
+    var returnStatusId = (long)TransectionStatusEnum.Returned;
+    var renewStatusId = (long)TransectionStatusEnum.Renewed;
+    var claimedLostStatusId = (long)TransectionStatusEnum.ClaimedLost;
+}
+
+<style>
+    tr:has(.form-check-input:checked) {
+        background-color: #d5c8e14a;
+    }
+
+    @@media (min-width: 500px) {
+        .update-penalty-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/stepperform.js" asp-append-version="true"></script>
+
+<div class="progress mb-2" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-color-purple" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<form asp-action="UpdatePenalty" class="needs-validation" id="updatePenaltyForm" method="post">
+    <i class="bi bi-arrow-left-circle bi-hover-bold cursor-pointer color-purple font-weight-bold position-absolute fs-2 action step-back"></i>
+
+    <div id="step1" class="card-body step">
+        <div class="text-center color-purple mb-4">
+            <h4 class="card-title font-weight-bold">Update Penalty info</h4>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="update-penalty-form-userId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.Users"
+                            asp-for="UserId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="UserId" class="did-floating-label">User<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="update-penalty-form-penaltyTypeId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.PenaltyTypeList"
+                            asp-for="PenaltyTypeId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="PenaltyTypeId" class="did-floating-label">Penalty Type<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="PenaltyTypeId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="update-penalty-form-statusId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.FineStatusList"
+                            asp-for="StatusId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="StatusId" class="did-floating-label">Status<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="StatusId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="my-2">
+            <div class="did-floating-label-content">
+                <textarea asp-for="Description" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+                <label asp-for="Description" class="did-floating-label">Penalty Description<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="Amount" type="number" class="did-floating-input" placeholder="" />
+                    <label asp-for="Amount" class="did-floating-label">Amount<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="OverDueDays" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                    <label asp-for="OverDueDays" class="did-floating-label">Overdue Days<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="OverDueDays" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="step2" class="card-body step" style="display: none;">
+        <div class="text-center mb-3">
+            <h4 class="card-title color-purple">Link Transaction</h4>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4 did-floating-label-content">
+                <input class="did-floating-input" id="disabled-userId" value="Please Select any user" placeholder="" />
+            </div>
+            <div class="col-md-5 update-penalty-form-col">
+                <div class="did-floating-label-content">
+                    <select id="update-penalty-form-transectionStatusId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.TransectionStatus"
+                            asp-for="TransectionStatusId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="TransectionStatusId" class="did-floating-label">Transaction Status<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="TransectionStatusId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <a class="btn btn-danger" id="clear-transection-btn">Clear selection</a>
+            </div>
+        </div>
+        <div class="text-center">
+            <div class="table-responsive scrollable-table" id="transactionTable">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="px-3">User</th>
+                            <th class="sortable-header" data-field="BookName">Book</th>
+                            <th class="sortable-header text-center" data-field="StatusLabel">Status</th>
+                            <th class="sortable-header text-center" data-field="HasPenalty">Has Penalty?</th>
+                            <th class="sortable-header text-center" data-field="BorrowDate">Borrow Date</th>
+                            <th class="sortable-header text-center" data-field="RenewDate">Renew Date</th>
+                            <th class="sortable-header text-center" data-field="DueDate">Due Date</th>
+                            <th class="sortable-header text-center" data-field="ReturnDate">Return Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Transections is not null && Model.Transections.Any())
+                        {
+                            @foreach (var item in Model.Transections)
+                            {
+                                <tr class="@(item.IsRemoved ? "bg-color-danger" : "bg-color-default")">
+                                    <td>
+                                        <input class="form-check-input radio" type="radio" asp-for="TransectionId" value="@item.Id">
+                                    </td>
+                                    <td>
+                                        <img src="@item.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(modelItem => item.UserName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BookName)
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="status-clip @(item.StatusLabelColor != null ? "dynamic-style" : "default-style")"
+                                             style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                            @Html.DisplayFor(modelItem => item.StatusLabel)
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.HasPenalty == true)
+                                        {
+                                            <i class="bi bi-check2 color-purple"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-x-lg color-purple"></i>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @item.BorrowDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                                    </td>
+                                    <td class="text-center">
+                                        @(item.RenewDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                                    </td>
+                                    <td class="text-center">
+                                        @item.DueDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                                    </td>
+                                    <td class="text-center">
+                                        @(item.ReturnDate?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center border-0">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <span asp-validation-for="TransectionId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-2 mb-2">
+        <button type="button" class="btn btn-submit w-100 action step-next">Next</button>
+        <button type="submit" class="btn btn-submit w-100 action submit" id="update-penalty-btn">Update Penalty</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        removeSingleDropdownValueAttr('#updatePenaltyForm #update-penalty-form-userId');
+        removeSingleDropdownValueAttr('#updatePenaltyForm #update-penalty-form-statusId');
+        removeSingleDropdownValueAttr('#updatePenaltyForm #update-penalty-form-penaltyTypeId');
+        removeSingleDropdownValueAttr('#updatePenaltyForm #update-penalty-form-transectionStatusId');
+        readonlySelect2('#updatePenaltyForm #update-penalty-form-userId');
+
+        if ('@isUnpaid'.toLowerCase() == 'false')
+            readonlySelect2('#updatePenaltyForm #update-penalty-form-transectionStatusId');
+
+        $('#updatePenaltyForm #disabled-userId').prop('readonly', true);
+
+        var lostStatusLookup = @Html.Raw(Json.Serialize(Model.Transections?.ToDictionary(m => m.Id, m => m.StatusLabel == @claimedLostStatus)));
+
+        toggalTransectionStatus(lostStatusLookup);
+
+        if ($('#updatePenaltyModel').length && $('#updatePenaltyModel').is(':hidden'))
+        {
+            $('#updatePenaltyModel').modal('show');
+        }
+
+        var selectedValue = $("#update-penalty-form-userId option:selected").text();
+        if (selectedValue === "")
+            selectedValue = "Please Select any user";
+
+        $('#disabled-userId').val(selectedValue);
+
+        $('.form-check-input.radio').off('change').on('change', function ()
+        {
+            toggalTransectionStatus(lostStatusLookup);
+        });
+
+        $('#update-penalty-form-userId').on('change', function ()
+        {
+            var selectedValue = $("#update-penalty-form-userId option:selected").text();
+            if (selectedValue === "")
+                selectedValue = "Please Select any user";
+
+            $('#disabled-userId').val(selectedValue);
+        });
+
+        $("tr").off('click').on('click', function ()
+        {
+            $(this).find(".form-check-input.radio").prop("checked", true).trigger("change");
+        });
+
+        $("#clear-transection-btn").off('click').on('click', function ()
+        {
+            $(".form-check-input.radio:checked").prop("checked", false).trigger("change");
+        });
+    });
+
+    $(document).off("submit", "#updatePenaltyForm").on("submit", "#updatePenaltyForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-penalty-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updatePenaltyModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-penalty-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-penalty-btn', false, 'color-purple btn-submit');
+        }
+    });
+
+    function toggalTransectionStatus(lookup)
+    {
+        var selectedValue = $(".form-check-input.radio:checked").val();
+        var isClaim = lookup[selectedValue];
+
+        if (isClaim)
+        {
+            $('#update-penalty-form-transectionStatusId').val(@claimedLostStatusId).trigger("change");
+            setSelect2OptionAccessibility('#updatePenaltyForm #update-penalty-form-transectionStatusId', ["@returnStatusId", "@renewStatusId"], true);
+        }
+        else
+        {
+            if ($('#updatePenaltyForm #update-penalty-form-transectionStatusId').val() === '@claimedLostStatusId')
+                $('#updatePenaltyForm #update-penalty-form-transectionStatusId').val('').trigger("change");
+
+            setSelect2OptionAccessibility('#updatePenaltyForm #update-penalty-form-transectionStatusId', ["@returnStatusId", "@renewStatusId"], false);
+            setSelect2OptionAccessibility('#updatePenaltyForm #update-penalty-form-transectionStatusId', ["@claimedLostStatusId"], true);
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

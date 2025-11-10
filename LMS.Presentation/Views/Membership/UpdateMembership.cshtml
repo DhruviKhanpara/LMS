@@ -1,0 +1,130 @@
+﻿@model LMS.Application.Contracts.DTOs.Membership.UpdateMembershipDto
+
+@{
+    ViewData["Id"] = "updateMembershipModel";
+    ViewData["ModelTitle"] = "Update Membership";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .update-membership-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<form asp-action="UpdateMembership" class="needs-validation" id="updateMembershipForm" method="post">
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <input asp-for="Type" class="did-floating-input" placeholder="" />
+            <label asp-for="Type" class="did-floating-label">Type<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="did-floating-label-content">
+            <textarea asp-for="Description" class="did-floating-textarea" rows="2" placeholder=""></textarea>
+            <label asp-for="Description" class="did-floating-label">Membership Description<sup class="text-danger">*</sup></label>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 update-membership-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Duration" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="Duration" class="did-floating-label">Duration(Days)<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-membership-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="BorrowLimit" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="BorrowLimit" class="did-floating-label">Borrow limit<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="BorrowLimit" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-membership-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="ReservationLimit" type="number" class="did-floating-input restrict-dot" placeholder="" />
+                <label asp-for="ReservationLimit" class="did-floating-label">Reservation limit<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="ReservationLimit" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4 update-membership-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Cost" type="number" class="did-floating-input" placeholder="" />
+                <label asp-for="Cost" class="did-floating-label">Cost<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Cost" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4 update-membership-form-col">
+            <div class="did-floating-label-content">
+                <input asp-for="Discount" type="number" class="did-floating-input" placeholder="" />
+                <label asp-for="Discount" class="did-floating-label">Discount<sup class="text-danger">*</sup></label>
+                <span asp-validation-for="Discount" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit w-100 mt-3 mb-2" id="update-membership-btn">Update Membership</button>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#updateMembershipModel').length && $('#updateMembershipModel').is(':hidden'))
+        {
+            $('#updateMembershipModel').modal('show');
+        }
+    });
+
+    $(document).off("submit", "#updateMembershipForm").on("submit", "#updateMembershipForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-membership-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updateMembershipModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-membership-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-membership-btn', false, 'color-purple btn-submit');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

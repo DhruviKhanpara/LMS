@@ -1,0 +1,50 @@
+﻿@using LMS.Presentation.HTMLHelper;
+
+@model IEnumerable<LMS.Application.Contracts.DTOs.JobHealthDto>
+
+@{
+    ViewData["Title"] = "GetDetailedJobHealth";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+@Html.Heading("Job Heath Information")
+<div class="container-fluid my-1">
+    <div class="table-responsive scrollable-table mt-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job Name</th>
+                    <th class="text-center">Last Execution</th>
+                    <th class="text-center">Next Execution</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Duration</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var job in Model)
+                {
+                    <tr>
+                        <td>@job.JobName</td>
+                        <td class="text-center">@job.LastExecution?.ToString("g")</td>
+                        <td class="text-center">@job.NextExecution?.ToString("g")</td>
+                        <td class="text-center">
+                            <div class="status-clip dynamic-style"
+                                 style="--bgcolor:@(job.LastState == " Succeeded" ? "#28A74529" : "#DC354529"); --textcolor:@(job.LastState == " Succeeded" ? "#28A745" : "#DC3545");">
+                                @job.LastState
+                            </div>
+                        </td>
+                        <td class="text-center">@job.Duration?.ToString(@"hh\:mm\:ss")</td>
+                        <td>@job.ErrorMessage</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

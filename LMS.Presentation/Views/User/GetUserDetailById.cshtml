@@ -1,0 +1,106 @@
+﻿@model LMS.Application.Contracts.DTOs.User.GetUserDetailDto
+
+@{
+    ViewData["Id"] = "getUserModal";
+    ViewData["ModelTitle"] = "User Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+@if (Model.HasPenalty == true)
+{
+    <div class="mb-2 py-1 fs-6 status-clip dynamic-style"
+         style="--bgcolor:#DC354529; --textcolor:#DC3545;">
+        Have unpaid penalty
+    </div>
+}
+@if (Model.HasOccupiedBook == true)
+{
+    <div class="mb-2 py-1 fs-6 status-clip dynamic-style"
+         style="--bgcolor:#007BFF29; --textcolor:#007BFF;">
+        Occupied Resources
+    </div>
+}
+@if (Model.HasActiveReservation == true)
+{
+    <div class="mb-2 py-1 fs-6 status-clip dynamic-style"
+         style="--bgcolor:#FFC10729; --textcolor:#FFC107;">
+        Have active reservations
+    </div>
+}
+@if (Model.HasActiveMembership == true)
+{
+    <div class="mb-2 py-1 fs-6 status-clip dynamic-style"
+         style="--bgcolor:#28A74529; --textcolor:#28A745;">
+        Have active membership
+    </div>
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>Name</b> :
+            <img src="@Model.ProfilePhoto" alt="User" width="20" height="20" class="rounded-circle cursor-pointer border-dark border-1 mx-1" onclick="showDocumentModal('@Model.ProfilePhoto')" />
+            @Html.DisplayFor(model => model.FirstName) 
+            @Html.DisplayFor(model => model.MiddleName) 
+            @Html.DisplayFor(model => model.LastName)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Username)</b> :
+            @Html.DisplayFor(model => model.Username)
+        </li>
+        <li class="list-group-item status-field">
+            <b>@Html.DisplayNameFor(model => model.Role)</b> :
+            <span class="status-dot"></span>
+            <span calss="status-text">@Html.DisplayFor(model => model.Role)</span>
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.LibraryCardNumber)</b> :
+            @Html.DisplayFor(model => model.LibraryCardNumber)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.JoiningDate)</b> :
+            @Model.JoiningDate.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Gender)</b> :
+            @Html.DisplayFor(model => model.Gender)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Dob)</b> :
+            @Model.Dob.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.MobileNo)</b> :
+            @Html.DisplayFor(model => model.MobileNo)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Email)</b> :
+            @Html.DisplayFor(model => model.Email)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Address)</b> :
+            @Html.DisplayFor(model => model.Address)
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getUserModal').length && $('#getUserModal').is(':hidden'))
+        {
+            $('#getUserModal').modal('show');
+        }
+    });
+
+    $('#transparentModal').off("hidden.bs.modal").on("hidden.bs.modal", function ()
+    {
+        $('#getUserModal').css('z-index', 1051);
+    });
+
+    $('#transparentModal').off("show.bs.modal").on("show.bs.modal", function ()
+    {
+        $('#getUserModal').css('z-index', 1050);
+    });
+</script>

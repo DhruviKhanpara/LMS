@@ -1,0 +1,364 @@
+﻿@using LMS.Core.Enums;
+
+@model LMS.Application.Contracts.DTOs.UserMembershipMapping.UpdateUserMembershipDto
+
+@{
+    ViewData["Id"] = "updateUserMembershipModel";
+    ViewData["ModelTitle"] = "Update User Membership";
+
+    bool useLayout = ViewData["UseLayout"] as bool? ?? true;
+    Layout = useLayout ? "~/Views/Shared/_ModalLayout.cshtml" : null;
+
+    var isAdmin = User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Admin));
+    var isLibrarian = User.Identity.IsAuthenticated && User.IsInRole(nameof(RoleListEnum.Librarian));
+    var isActive = Model.EffectiveStartDate < DateTimeOffset.UtcNow && Model.ExpirationDate > DateTimeOffset.UtcNow;
+}
+
+<style>
+    @@media (min-width: 500px) {
+        .update-user-membership-form-col {
+            flex: 1 0 0%;
+        }
+    }
+</style>
+
+<script src="~/js/stepperform.js" asp-append-version="true"></script>
+
+<div class="progress mb-2" style="height: 5px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-color-purple" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<form asp-action="UpdateUserMembership" class="needs-validation" id="updateUserMembershipForm" method="post">
+    <i class="bi bi-arrow-left-circle bi-hover-bold cursor-pointer color-purple font-weight-bold position-absolute fs-2 action step-back"></i>
+
+    <div id="step1" class="card-body pb-0 step">
+        <div class="text-center color-purple mb-4">
+            <h4 class="card-title font-weight-bold">Select User and Add plan option</h4>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <select id="update-user-membership-form-userId"
+                            class="did-floating-select select2-single"
+                            asp-items="@Model.Users"
+                            asp-for="UserId"
+                            onclick="this.setAttribute('value', this.value);"
+                            onchange="this.setAttribute('value', this.value);"
+                            value="">
+                        <option value=""></option>
+                    </select>
+                    <label asp-for="UserId" class="did-floating-label">User<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            @if (isAdmin && isActive)
+            {
+                <div class="col-md update-user-membership-form-col">
+                    <div class="did-floating-label-content">
+                        <div class="password-container">
+                            <input asp-for="UserPassword" type="password" class="did-floating-input" id="user-password" placeholder="">
+                            <label asp-for="UserPassword" class="did-floating-label">User Password<sup class="text-danger">*</sup></label>
+                            <span class="togglePassword" onmousedown="passwordVisibilityStart(this)" onmouseup="passwordVisibilityEnd(this)">
+                                <i class="fa fa-eye"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="UserPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+            <div class="col-md update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="EffectiveStartDate" type="datetime-local" class="did-floating-input" id="startDate" value='@Model.EffectiveStartDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                    <label asp-for="EffectiveStartDate" class="did-floating-label">Effective start Date<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="EffectiveStartDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="ExpirationDate" type="datetime-local" class="did-floating-input" id="expirationDate" value='@Model.ExpirationDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")' placeholder="" />
+                    <label asp-for="ExpirationDate" class="did-floating-label">Expiration Date</label>
+                    <span asp-validation-for="ExpirationDate" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            @if (isLibrarian)
+            {
+                <div class="col-md update-user-membership-form-col">
+                    <div class="did-floating-label-content">
+                        <div class="password-container">
+                            <input asp-for="UserPassword" type="password" class="did-floating-input" id="user-password" placeholder="">
+                            <label asp-for="UserPassword" class="did-floating-label">User Password<sup class="text-danger">*</sup></label>
+                            <span class="togglePassword" onmousedown="passwordVisibilityStart(this)" onmouseup="passwordVisibilityEnd(this)">
+                                <i class="fa fa-eye"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="UserPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+            <div class="col-md update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="BorrowLimit" type="number" class="did-floating-input restrict-dot" id="borrow-limit" placeholder="" />
+                    <label asp-for="BorrowLimit" class="did-floating-label">Borrow limit<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="BorrowLimit" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="ReservationLimit" type="number" class="did-floating-input restrict-dot" id="reservation-limit" placeholder="" />
+                    <label asp-for="ReservationLimit" class="did-floating-label">Reservation limit<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="ReservationLimit" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-4 update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="MembershipCost" type="number" class="did-floating-input" id="membership-cost" placeholder="" />
+                    <label asp-for="MembershipCost" class="did-floating-label">Membership cost<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="MembershipCost" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="Discount" type="number" class="did-floating-input" id="discount" placeholder="" />
+                    <label asp-for="Discount" class="did-floating-label">Discount<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="Discount" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 update-user-membership-form-col">
+                <div class="did-floating-label-content">
+                    <input asp-for="PaidAmount" type="number" class="did-floating-input" id="paid-amount" placeholder="" />
+                    <label asp-for="PaidAmount" class="did-floating-label">Paid Amount<sup class="text-danger">*</sup></label>
+                    <span asp-validation-for="PaidAmount" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="step2" class="card-body step" style="display: none;">
+        <div class="text-center mb-3">
+            <h4 class="card-title color-purple">Select Membership</h4>
+        </div>
+        <div class="text-center">
+            <div class="table-responsive scrollable-table">
+                <table class="table">
+                    <thead class="bg-color-gray">
+                        <tr>
+                            <th></th>
+                            <th class="sortable-header" data-field="Type">Type</th>
+                            <th class="sortable-header text-center" data-field="BorrowLimit">Borrow Limit</th>
+                            <th class="sortable-header text-center" data-field="ReservationLimit">Reservation Limit</th>
+                            <th class="sortable-header text-center" data-field="Duration">Duration in Days</th>
+                            <th class="sortable-header text-center" data-field="Cost">Cost</th>
+                            <th class="sortable-header text-center" data-field="Discount">Discount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Memberships is not null && Model.Memberships.Any())
+                        {
+                            @foreach (var item in Model.Memberships)
+                            {
+                                <tr class="cursor-pointer bg-color-light-gray">
+                                    <td>
+                                        <input class="form-check-input radio" type="radio" asp-for="MembershipId" value="@item.Id">
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Type)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.BorrowLimit)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.ReservationLimit)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Duration)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Cost)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.Discount)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center border-0">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <span asp-validation-for="MembershipId" class="text-danger"></span>
+        </div>
+    </div>
+
+    @if (isLibrarian || (isAdmin && isActive))
+    {
+        <div class="mb-3" id="warning-for-librarian">
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            <span class="text-warning">If user password is not valid then borrow limit and reservation limit is not update.</span>
+        </div>
+    }
+
+    <div class="mt-2 mb-2">
+        <button type="button" class="btn btn-submit w-100 action step-next">Next</button>
+        <button type="submit" class="btn btn-submit w-100 action submit" id="update-user-membership-btn">Update User Membership</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var oldBorrowLimit = @Model.BorrowLimit;
+        var oldReservationLimit = @Model.ReservationLimit;
+        var startDate = "@Model.EffectiveStartDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+        var expirationDate = "@Model.ExpirationDate.ToLocalTime().ToString("yyyy-MM-ddTHH:mm").Trim()";
+
+        removeSingleDropdownValueAttr('#updateUserMembershipForm #update-user-membership-form-userId');
+        readonlySelect2("#updateUserMembershipForm #update-user-membership-form-userId");
+        readonlyField(".radio");
+
+        if ("@isLibrarian".toLowerCase() == "true" || ("@isAdmin".toLowerCase() == "true" && "@isActive".toLowerCase() == "true"))
+        {
+            $("#expirationDate").prop("readonly", true);
+            $("#startDate").prop("readonly", true);
+            $("#borrow-limit").prop("readonly", true);
+            $("#reservation-limit").prop("readonly", true);
+
+            $('#user-password').keyup(function () { handlePasswordInputForLimitsFields(this, oldBorrowLimit, oldReservationLimit); });
+
+            if ("@isAdmin".toLowerCase() == "true" && "@isActive".toLowerCase() == "true")
+            {
+                $('#user-password').keyup(function () { handlePasswordInputForDateFields(this, startDate, expirationDate); });
+            }
+        }
+
+        if ($('#updateUserMembershipModel').length && $('#updateUserMembershipModel').is(':hidden'))
+        {
+            $('#updateUserMembershipModel').modal('show');
+        }
+
+        $("#startDate").off("change").on("change", function () { validateDates(this); });
+        $("#expirationDate").off("change").on("change", function () { validateDates(this); });
+
+        $("#membership-cost").off("change").on("change", function () { validateCosts(this); });
+        $("#discount").off("change").on("change", function () { validateCosts(this); });
+        $("#paid-amount").off("change").on("change", function () { validateCosts(this); });
+    });
+
+    $(document).off("submit", "#updateUserMembershipForm").on("submit", "#updateUserMembershipForm", function (event)
+    {
+        event.preventDefault();
+        toggleButtonState('#update-user-membership-btn', true, 'color-purple btn-submit');
+
+        if ($(this).valid())
+        {
+            let formData = new FormData(this);
+            this.reset();
+
+            formData.set("Id", @Model.Id);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response, status, xhr)
+                {
+                    if (xhr.getResponseHeader("content-type").toLowerCase().includes("text/html"))
+                    {
+                        $("#updateUserMembershipModel .modal-body").html(response);
+                    } else if (response.success)
+                    {
+                        window.location.href = response.visit;
+                    }
+                },
+                complete: function ()
+                {
+                    toggleButtonState('#update-user-membership-btn', false, 'color-purple btn-submit');
+                }
+            });
+        } else
+        {
+            toggleButtonState('#update-user-membership-btn', false, 'color-purple btn-submit');
+        }
+    });
+
+    function validateDates(triggeredField)
+    {
+        let startDate = new Date($("#startDate").val());
+        let expirationDate = new Date($("#expirationDate").val());
+
+        if (!isNaN(startDate) && !isNaN(expirationDate) && expirationDate < startDate)
+        {
+            toastr.error("Start Date must be earlier then Expiration Date!", "Error");
+            $(triggeredField).val("");
+        }
+    }
+
+    function handlePasswordInputForLimitsFields(selector, oldBorrowLimit, oldReservationLimit)
+    {
+        if ($(selector).val().length === 0)
+        {
+            $('#borrow-limit').val(oldBorrowLimit).prop('readonly', true);
+            $('#reservation-limit').val(oldReservationLimit).prop('readonly', true);
+        }
+        else
+        {
+            $('#borrow-limit').prop('readonly', false);
+            $('#reservation-limit').prop('readonly', false);
+        }
+    }
+
+    function handlePasswordInputForDateFields(selector, startDate, expirationDate)
+    {
+        if ($(selector).val().length === 0)
+        {
+            $('#startDate').val(startDate).prop('readonly', true);
+            $('#expirationDate').val(expirationDate).prop('readonly', true);
+        }
+        else
+        {
+            $('#startDate').prop('readonly', false);
+            $('#expirationDate').prop('readonly', false);
+        }
+    }
+
+    function validateCosts(triggeredField)
+    {
+        let membershipCost = Number($("#membership-cost").val());
+        let discount = Number($("#discount").val());
+        let paidAmount = Number($("#paid-amount").val());
+        
+        if (!isNaN(membershipCost))
+        {
+            if (!isNaN(discount) && membershipCost <= discount)
+            {
+                toastr.error("Membership cost must be greater than Discount!", "Error");
+                $(triggeredField).val("");
+            }
+            if (!isNaN(paidAmount) && membershipCost <= paidAmount)
+            {
+                toastr.error("Paid amount must be greater than Membership cost!", "Error");
+                $(triggeredField).val("");
+            }
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

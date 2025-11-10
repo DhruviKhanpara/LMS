@@ -1,0 +1,35 @@
+﻿@model LMS.Application.Contracts.DTOs.Genre.GetGenreDto
+
+@{
+    ViewData["Id"] = "getGenreModal";
+    ViewData["ModelTitle"] = "Genre Information";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Name)</b> :
+            @Html.DisplayFor(model => model.Name)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.Description)</b> :
+            @Html.DisplayFor(model => model.Description)
+        </li>
+        <li class="list-group-item">
+            <b>@Html.DisplayNameFor(model => model.TotalActiveBooks)</b> :
+            @Html.DisplayFor(model => model.TotalActiveBooks)
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        if ($('#getGenreModal').length && $('#getGenreModal').is(':hidden'))
+        {
+            $('#getGenreModal').modal('show');
+        }
+    });
+</script>
