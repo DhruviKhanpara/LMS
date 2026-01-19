@@ -7,17 +7,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LMS.Presentation.Controllers;
 
-public class LogController : Controller
+public class HistoryController : Controller
 {
     private readonly IServiceManager _serviceManager;
 
-    public LogController(IServiceManager serviceManager)
+    public HistoryController(IServiceManager serviceManager)
     {
         _serviceManager = serviceManager;
     }
 
     [HttpGet]
-    [Route("log/audit-history/book")]
+    [Route("history/audit-history/book")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetBookAuditHistoryByBookId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -37,7 +37,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/config")]
+    [Route("history/audit-history/config")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetConfigsAuditHistoryByConfigId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -57,7 +57,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/genre")]
+    [Route("history/audit-history/genre")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetGenreAuditHistoryByGenreId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -77,7 +77,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/membership")]
+    [Route("history/audit-history/membership")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetMembershipAuditHistoryByMembershipId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -97,7 +97,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/penalty")]
+    [Route("history/audit-history/penalty")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetPenaltyAuditHistoryByPenaltyId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -117,7 +117,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/reservation")]
+    [Route("history/audit-history/reservation")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetReservationAuditHistoryByReservationId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -137,7 +137,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/transection")]
+    [Route("history/audit-history/transection")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetTransectionAuditHistoryByTransectionId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -157,7 +157,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/user")]
+    [Route("history/audit-history/user")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetUserAuditHistoryByUserId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -177,7 +177,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/user-membership")]
+    [Route("history/audit-history/user-membership")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetUserMembershipAuditHistoryByUserMembershipId(long id, string? logOperation = null, bool needJson = false)
     {
@@ -197,7 +197,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/books")]
+    [Route("history/audit-history/books")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetBooksAuditHistory(int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? id = null, long? performedBy = null)
     {
@@ -213,7 +213,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/configs")]
+    [Route("history/audit-history/configs")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetConfigsAuditHistory(int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? id = null, long? performedBy = null)
     {
@@ -229,7 +229,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/genres")]
+    [Route("history/audit-history/genres")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetGenresAuditHistory(int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? id = null, long? performedBy = null)
     {
@@ -245,7 +245,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/memberships")]
+    [Route("history/audit-history/memberships")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetMembershipsAuditHistory(int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? id = null, long? performedBy = null)
     {
@@ -261,7 +261,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/penalties")]
+    [Route("history/audit-history/penalties")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetPenaltiesAuditHistory(long id, int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? performedBy = null)
     {
@@ -276,7 +276,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/reservations")]
+    [Route("history/audit-history/reservations")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetReservationsAuditHistory(long id, int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? performedBy = null)
     {
@@ -291,7 +291,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/transections")]
+    [Route("history/audit-history/transections")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetTransectionsAuditHistory(long id, int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? performedBy = null)
     {
@@ -306,7 +306,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/users")]
+    [Route("history/audit-history/users")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetUsersAuditHistory(int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? id = null, long? performedBy = null)
     {
@@ -322,7 +322,7 @@ public class LogController : Controller
     }
 
     [HttpGet]
-    [Route("log/audit-history/user-memberships")]
+    [Route("history/audit-history/user-memberships")]
     [AuthorizeRoles(RoleListEnum.Admin)]
     public async Task<IActionResult> GetUserMembershipsAuditHistory(long id, int pageSize = 10, int pageNumber = 1, string? orderBy = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, string? logOperation = null, long? performedBy = null)
     {
