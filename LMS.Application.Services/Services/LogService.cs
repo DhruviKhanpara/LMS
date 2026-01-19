@@ -29,7 +29,7 @@ internal class LogService : ILogService
         _mapper = mapper;
     }
 
-    public async Task<PaginatedResponseDto<BooksLogDto>> GetBooksLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<BooksHistoryDto>> GetBooksLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -56,19 +56,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var booksLog = await booksLogQuery
-            .ProjectTo<BooksLogDto>(_mapper.ConfigurationProvider)
-            .Sort<BooksLogDto>(orderBy: orderBy)
+            .ProjectTo<BooksHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<BooksHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<BooksLogDto>()
+        return new PaginatedResponseDto<BooksHistoryDto>()
         {
             Pagination = paginationModel,
             Data = booksLog
         };
     }
 
-    public async Task<PaginatedResponseDto<ConfigsLogDto>> GetConfigsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<ConfigsHistoryDto>> GetConfigsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -95,19 +95,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var configsLog = await configsLogQuery
-            .ProjectTo<ConfigsLogDto>(_mapper.ConfigurationProvider)
-            .Sort<ConfigsLogDto>(orderBy: orderBy)
+            .ProjectTo<ConfigsHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<ConfigsHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<ConfigsLogDto>()
+        return new PaginatedResponseDto<ConfigsHistoryDto>()
         {
             Pagination = paginationModel,
             Data = configsLog
         };
     }
 
-    public async Task<PaginatedResponseDto<GenreLogDto>> GetGenresLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<GenreHistoryDto>> GetGenresLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -134,19 +134,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var genreLog = await genreLogQuery
-            .ProjectTo<GenreLogDto>(_mapper.ConfigurationProvider)
-            .Sort<GenreLogDto>(orderBy: orderBy)
+            .ProjectTo<GenreHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<GenreHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<GenreLogDto>()
+        return new PaginatedResponseDto<GenreHistoryDto>()
         {
             Pagination = paginationModel,
             Data = genreLog
         };
     }
 
-    public async Task<PaginatedResponseDto<PenaltyLogDto>> GetPenaltiesLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<PenaltyHistoryDto>> GetPenaltiesLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -173,19 +173,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var penaltyLog = await penaltyLogQuery
-            .ProjectTo<PenaltyLogDto>(_mapper.ConfigurationProvider)
-            .Sort<PenaltyLogDto>(orderBy: orderBy)
+            .ProjectTo<PenaltyHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<PenaltyHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<PenaltyLogDto>()
+        return new PaginatedResponseDto<PenaltyHistoryDto>()
         {
             Pagination = paginationModel,
             Data = penaltyLog
         };
     }
 
-    public async Task<PaginatedResponseDto<MembershipLogDto>> GetMembershipsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<MembershipHistoryDto>> GetMembershipsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -212,19 +212,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var membershipLog = await membershipLogQuery
-            .ProjectTo<MembershipLogDto>(_mapper.ConfigurationProvider)
-            .Sort<MembershipLogDto>(orderBy: orderBy)
+            .ProjectTo<MembershipHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<MembershipHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<MembershipLogDto>()
+        return new PaginatedResponseDto<MembershipHistoryDto>()
         {
             Pagination = paginationModel,
             Data = membershipLog
         };
     }
 
-    public async Task<PaginatedResponseDto<ReservationLogDto>> GetReservationsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<ReservationHistoryDto>> GetReservationsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -251,19 +251,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var reservationLog = await reservationLogQuery
-            .ProjectTo<ReservationLogDto>(_mapper.ConfigurationProvider)
-            .Sort<ReservationLogDto>(orderBy: orderBy)
+            .ProjectTo<ReservationHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<ReservationHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<ReservationLogDto>()
+        return new PaginatedResponseDto<ReservationHistoryDto>()
         {
             Pagination = paginationModel,
             Data = reservationLog
         };
     }
 
-    public async Task<PaginatedResponseDto<TransectionLogDto>> GetTransectionsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<TransectionHistoryDto>> GetTransectionsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -290,19 +290,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var transectionLog = await transectionLogQuery
-            .ProjectTo<TransectionLogDto>(_mapper.ConfigurationProvider)
-            .Sort<TransectionLogDto>(orderBy: orderBy)
+            .ProjectTo<TransectionHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<TransectionHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<TransectionLogDto>()
+        return new PaginatedResponseDto<TransectionHistoryDto>()
         {
             Pagination = paginationModel,
             Data = transectionLog
         };
     }
 
-    public async Task<PaginatedResponseDto<UserLogDto>> GetUsersLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<UserHistoryDto>> GetUsersLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -329,19 +329,19 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var userLog = await userLogQuery
-            .ProjectTo<UserLogDto>(_mapper.ConfigurationProvider)
-            .Sort<UserLogDto>(orderBy: orderBy)
+            .ProjectTo<UserHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<UserHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<UserLogDto>()
+        return new PaginatedResponseDto<UserHistoryDto>()
         {
             Pagination = paginationModel,
             Data = userLog
         };
     }
 
-    public async Task<PaginatedResponseDto<UserMembershipMappingLogDto>> GetUserMembershipsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
+    public async Task<PaginatedResponseDto<UserMembershipMappingHistoryDto>> GetUserMembershipsLogAsync(long? id = null, int? pageSize = null, int? pageNumber = null, string? orderBy = null, string? logOperation = null, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null, long? performedByUserId = null)
     {
         var authUserRole = _httpContext!.GetUserRole();
 
@@ -368,12 +368,12 @@ internal class LogService : ILogService
             : new PaginationModel(totalCount: totalCount);
 
         var userMembershipMappingLog = await userMembershipMappingLogQuery
-            .ProjectTo<UserMembershipMappingLogDto>(_mapper.ConfigurationProvider)
-            .Sort<UserMembershipMappingLogDto>(orderBy: orderBy)
+            .ProjectTo<UserMembershipMappingHistoryDto>(_mapper.ConfigurationProvider)
+            .Sort<UserMembershipMappingHistoryDto>(orderBy: orderBy)
             .Paginate(pageSize: paginationModel.PageSize, pageNumber: paginationModel.PageNumber)
             .ToListAsync();
 
-        return new PaginatedResponseDto<UserMembershipMappingLogDto>()
+        return new PaginatedResponseDto<UserMembershipMappingHistoryDto>()
         {
             Pagination = paginationModel,
             Data = userMembershipMappingLog

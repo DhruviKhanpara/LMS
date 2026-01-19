@@ -1,0 +1,191 @@
+﻿@using LMS.Presentation.HTMLHelper;
+
+@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Log.BooksHistoryDto>
+
+@{
+    ViewData["Title"] = "GetBooksAuditHistory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+<script src="~/js/sorting.js" asp-append-version="true"></script>
+<script src="~/js/filterSelector.js" asp-append-version="true"></script>
+
+@Html.Heading("Book History")
+
+<div class="container-fluid my-1">
+    <div class="d-flex justify-content-end px-3 mb-3 mt-4 gap-3">
+        <div class="did-floating-label-content m-0">
+            <input type="date" 
+                   value='@DateTime.UtcNow.ToLocalTime().AddMonths(-1).ToString("yyyy-MM-dd")' 
+                   class="did-floating-input filter-options" 
+                   data-params="startDate"
+                   placeholder="" />
+            <label class="did-floating-label">Start Date</label>
+        </div>
+        <div class="did-floating-label-content m-0">
+            <input type="date" 
+                   value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-dd")' 
+                   class="did-floating-input filter-options"
+                   data-params="endDate"
+                   placeholder="" />
+            <label class="did-floating-label">End Date</label>
+        </div>
+        <div class="did-floating-label-content m-0 w-15">
+            <select
+                    class="did-floating-select select2-single filter-options"
+                    data-params="id"
+                    asp-items="@(Model.Selections.ContainsKey("BookOptions") ? Model.Selections["BookOptions"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Book</label>
+        </div>
+        <div class="did-floating-label-content m-0 w-15">
+            <select class="did-floating-select select2-single filter-options"
+                    data-params="logOperation"
+                    asp-items="@(Model.Selections.ContainsKey("LogOpeartions") ? Model.Selections["LogOpeartions"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Log option</label>
+        </div>
+        <div class="did-floating-label-content m-0 w-15">
+            <select class="did-floating-select select2-single filter-options"
+                    data-params="performedBy"
+                    asp-items="@(Model.Selections.ContainsKey("PerformedByOptions") ? Model.Selections["PerformedByOptions"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Performed By</label>
+        </div>
+    </div>
+    <div class="table-responsive scrollable-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="sortable-header text-center" data-field="Operation">Operations</th>
+                    <th class="sortable-header text-center" data-field="LogType">Log Type</th>
+                    <th class="sortable-header text-center" data-field="LogTime">Log Time</th>
+                    <th class="text-center">Performed By</th>
+                    <th class="sortable-header text-center" data-field="StatusLabel">Status</th>
+                    <th class="sortable-header" data-field="Title">Title</th>
+                    <th class="sortable-header" data-field="Isbn">ISBN number</th>
+                    <th class="sortable-header" data-field="GenreName">Genre</th>
+                    <th class="sortable-header text-center" data-field="TotalCopies">Total copies</th>
+                    <th class="sortable-header text-center" data-field="AvailableCopies">Available copies</th>
+                    <th class="sortable-header text-center" data-field="Price">Price</th>
+                    <th class="sortable-header" data-field="Author">Author</th>
+                    <th class="sortable-header" data-field="Publisher">Publisher</th>
+                    <th class="sortable-header text-center" data-field="PublishAt">Publish date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Data is not null && Model.Data.Any())
+                {
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="bg-color-default">
+                            <td class="text-center">
+                                @if (item.Operation != null)
+                                {
+                                    <div class="status-clip @(item.Operation != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.OperationBgColor; --textcolor:@item.OperationColor;">
+                                        @Html.DisplayFor(modelItem => item.Operation)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.LogType != null)
+                                {
+                                    <div class="status-clip @(item.LogType != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.LogTypeBgColor; --textcolor:@item.LogTypeColor;">
+                                        @Html.DisplayFor(modelItem => item.LogType)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.LogTime?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.PerformedBy ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @if (item.StatusLabel != null)
+                                {
+                                    <div class="status-clip @(item.StatusLabel != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                        @Html.DisplayFor(modelItem => item.StatusLabel)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td>
+                                @(item.Title ?? "-")
+                            </td>
+                            <td>
+                                @(item.Isbn ?? "-")
+                            </td>
+                            <td>
+                                @(item.GenreName ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.TotalCopies?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.AvailableCopies?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.Price?.ToString() ?? "-")
+                                @if (item.Price.HasValue)
+                                {
+                                    <i class="fa fa-inr" aria-hidden="true"></i>
+                                }
+                            </td>
+                            <td>
+                                @(item.Author ?? "-")
+                            </td>
+                            <td>
+                                @(item.Publisher ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @item.PublishAt?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="14" class="text-center border-0">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @{
+        await Html.RenderPartialAsync("_PaginationPartial", Model.Pagination);
+    }
+</div>

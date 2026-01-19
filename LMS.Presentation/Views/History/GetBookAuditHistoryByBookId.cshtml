@@ -1,0 +1,268 @@
+﻿@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Log.BooksHistoryDto>
+
+@{
+    ViewData["Id"] = "getBookHistoryByIdModal";
+    ViewData["ModelTitle"] = "Book History";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+<div class="container-fluid my-1">
+    <div class="d-flex justify-content-end mb-3 gap-3">
+        <div class="did-floating-label-content m-0">
+            <input type="date" value='@DateTime.UtcNow.ToLocalTime().AddMonths(-1).ToString("yyyy-MM-dd")' class="did-floating-input date-filter" placeholder="" />
+            <label class="did-floating-label">Start Date</label>
+        </div>
+        <div class="did-floating-label-content m-0">
+            <input type="date" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-dd")' class="did-floating-input date-filter" placeholder="" />
+            <label class="did-floating-label">End Date</label>
+        </div>
+        <div class="did-floating-label-content m-0 w-25">
+            <select id="log-operation-select"
+                    class="did-floating-select select2-single"
+                    asp-items="@(Model.Selections.ContainsKey("LogOpeartions") ? Model.Selections["LogOpeartions"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Log Opeartion</label>
+        </div>
+    </div>
+    <div class="table-responsive scrollable-table">
+        <table class="table" id="bookLogTable" data-id="@ViewData["SelectedBook"]">
+            <thead>
+                <tr>
+                    <th class="text-center">Operations</th>
+                    <th class="text-center">Log Type</th>
+                    <th class="text-center">Log Time</th>
+                    <th class="text-center">Performed By</th>
+                    <th class="text-center">Status</th>
+                    <th>Title</th>
+                    <th>ISBN number</th>
+                    <th>Genre</th>
+                    <th class="text-center">Total copies</th>
+                    <th class="text-center">Available copies</th>
+                    <th class="text-center">Price</th>
+                    <th>Author</th>
+                    <th>Publisher</th>
+                    <th class="text-center">Publish date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model is not null && Model.Data.Any())
+                {
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="bg-color-default">
+                            <td class="text-center">
+                                @if (item.Operation != null)
+                                {
+                                    <div class="status-clip @(item.Operation != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.OperationBgColor; --textcolor:@item.OperationColor;">
+                                        @Html.DisplayFor(modelItem => item.Operation)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.LogType != null)
+                                {
+                                    <div class="status-clip @(item.LogType != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.LogTypeBgColor; --textcolor:@item.LogTypeColor;">
+                                        @Html.DisplayFor(modelItem => item.LogType)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -   
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.LogTime?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.PerformedBy ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @if (item.StatusLabel != null)
+                                {
+                                    <div class="status-clip @(item.StatusLabel != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                        @Html.DisplayFor(modelItem => item.StatusLabel)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td>
+                                @(item.Title ?? "-")
+                            </td>
+                            <td>
+                                @(item.Isbn ?? "-")
+                            </td>
+                            <td>
+                                @(item.GenreName?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.TotalCopies?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.AvailableCopies?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.Price?.ToString() ?? "-") 
+                                @if (item.Price.HasValue)
+                                {
+                                    <i class="fa fa-inr" aria-hidden="true"></i>
+                                }
+                            </td>
+                            <td>
+                                @(item.Author ?? "-")
+                            </td>
+                            <td>
+                                @(item.Publisher ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @item.PublishAt?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt")
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="14" class="text-center border-0">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-end mt-2">
+        <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Log" asp-action="GetBooksAuditHistory" asp-route-id="@ViewData["SelectedBook"]">See more</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        readonlyField(".date-filter");
+
+        if ($('#getBookHistoryByIdModal').length && $('#getBookHistoryByIdModal').is(':hidden'))
+        {
+            $('#getBookHistoryByIdModal').modal('show');
+        }
+
+        $('#log-operation-select').on("change", function ()
+        {
+            event.preventDefault();
+
+            var logOperation = $(this).val();
+            const bookId = $("#bookLogTable").data('id');
+
+            $.ajax({
+                url: '@Url.Action("GetBookAuditHistoryByBookId", "Log")',
+                data: { id: bookId, logOperation: logOperation, needJson: true },
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response)
+                {
+                    let tableBody = $("#bookLogTable tbody");
+                    if (response && response.length > 0)
+                    {
+                        tableBody.empty();
+
+                        response.forEach(function (item)
+                        {
+                            let row = `<tr class="bg-color-default">`;
+
+                            if (item.operation != null && item.operation != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                        <div class="status-clip ${item.operation != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.operationBgColor}; --textcolor:${item.operationColor};">
+                                            ${item.operation}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            if (item.logType != null && item.logType != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                        <div class="status-clip ${item.logType != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.logTypeBgColor}; --textcolor:${item.logTypeColor};">
+                                            ${item.logType}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            row += `
+                                    <td class="text-center">${formatDate(item.logTime)}</td>
+                                    <td class="text-center">${item.performedBy ?? "-"}</td>`;
+
+                            if (item.statusLabel != null && item.statusLabel != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                        <div class="status-clip ${item.statusLabel != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.statusLabelBgColor}; --textcolor:${item.statusLabelColor};">
+                                            ${item.statusLabel}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            row += `
+                                    <td>${item.title ?? "-"}</td>
+                                    <td>${item.isbn ?? "-"}</td>
+                                    <td>${item.genreName ?? "-"}</td>
+                                    <td class="text-center">${item.totalCopies ?? "-"}</td>
+                                    <td class="text-center">${item.availableCopies ?? "-"}</td>
+                                    <td class="text-center">${item.price?.toFixed(2) ?? "-"} `;
+
+                            if (item.price != null && item.price != undefined) 
+                            {
+                                row += `<i class="fa fa-inr" aria-hidden="true"></i>`;
+                            }
+                            
+                            row += `</td>
+                                    <td>${item.author ?? "-"}</td>
+                                    <td>${item.publisher ?? "-"}</td>
+                                    <td class="text-center">${formatDate(item.publishAt)}</td>
+                                </tr>`;
+
+                            tableBody.append(row);
+                        });
+                    } else
+                    {
+                        tableBody.html('<tr><td colspan="14" class="text-center border-0">No records found</td></tr>');
+                    }
+                }
+            });
+        });
+    });
+</script>

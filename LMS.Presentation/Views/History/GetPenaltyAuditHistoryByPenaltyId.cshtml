@@ -1,0 +1,266 @@
+﻿@model LMS.Application.Contracts.DTOs.PaginatedResponseDto<LMS.Application.Contracts.DTOs.Log.PenaltyHistoryDto>
+
+@{
+    ViewData["Id"] = "getPenaltyHistoryByIdModal";
+    ViewData["ModelTitle"] = "Penalty History";
+
+    Layout = "~/Views/Shared/_ModalLayout.cshtml";
+}
+
+<style>
+    th {
+        position: relative;
+    }
+</style>
+
+<div class="container-fluid my-1">
+    <div class="d-flex justify-content-end mb-3 gap-3">
+        <div class="did-floating-label-content m-0">
+            <input type="date" value='@DateTime.UtcNow.ToLocalTime().AddMonths(-1).ToString("yyyy-MM-dd")' class="did-floating-input date-filter" placeholder="" />
+            <label class="did-floating-label">Start Date</label>
+        </div>
+        <div class="did-floating-label-content m-0">
+            <input type="date" value='@DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-dd")' class="did-floating-input date-filter" placeholder="" />
+            <label class="did-floating-label">End Date</label>
+        </div>
+        <div class="did-floating-label-content m-0 w-25">
+            <select id="log-operation-select"
+                    class="did-floating-select select2-single"
+                    asp-items="@(Model.Selections.ContainsKey("LogOpeartions") ? Model.Selections["LogOpeartions"] : new List<SelectListItem>())"
+                    onclick="this.setAttribute('value', this.value);"
+                    onchange="this.setAttribute('value', this.value);"
+                    value="">
+                <option value=""></option>
+            </select>
+            <label class="did-floating-label">Log Opeartion</label>
+        </div>
+    </div>
+    <div class="table-responsive scrollable-table">
+        <table class="table" id="penaltyLogTable" data-id="@ViewData["SelectedPenalty"]">
+            <thead>
+                <tr>
+                    <th class="text-center">Operations</th>
+                    <th class="text-center">Log Type</th>
+                    <th class="text-center">Log Time</th>
+                    <th class="text-center">Performed By</th>
+                    <th class="text-center">User</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Transection Due Date</th>
+                    <th class="text-center">Penalty Type</th>
+                    <th>Description</th>
+                    <th class="text-center">Amount</th>
+                    <th class="text-center">Overdue Days</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model is not null && Model.Data.Any())
+                {
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="bg-color-default">
+                            <td class="text-center">
+                                @if (item.Operation != null)
+                                {
+                                    <div class="status-clip @(item.Operation != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.OperationBgColor; --textcolor:@item.OperationColor;">
+                                        @Html.DisplayFor(modelItem => item.Operation)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.LogType != null)
+                                {
+                                    <div class="status-clip @(item.LogType != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.LogTypeBgColor; --textcolor:@item.LogTypeColor;">
+                                        @Html.DisplayFor(modelItem => item.LogType)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.LogTime?.DateTime.ToString("dd-MM-yyyy hh:mm:ss tt") ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.PerformedBy ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.UserName ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @if (item.StatusLabel != null)
+                                {
+                                    <div class="status-clip @(item.StatusLabel != null ? "dynamic-style" : "default-style")"
+                                         style="--bgcolor:@item.StatusLabelBgColor; --textcolor:@item.StatusLabelColor;">
+                                        @Html.DisplayFor(modelItem => item.StatusLabel)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @: -
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.TransectionDueDate?.ToString() ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.PenaltyTypeName ?? "-")
+                            </td>
+                            <td class="truncate-description-container" data-max-length="50" data-bs-toggle="tooltip" data-bs-placement="right" title="@item.Description">
+                                @(item.Description ?? "-")
+                            </td>
+                            <td class="text-center">
+                                @(item.Amount?.ToString() ?? "-")
+                                @if (item.Amount.HasValue)
+                                {
+                                    <i class="fa fa-inr" aria-hidden="true"></i>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @(item.OverDueDays?.ToString() ?? "-")
+                                @if (item.OverDueDays.HasValue)
+                                {
+                                    @: Days
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" class="text-center border-0">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-end mt-2">
+        <a class="text-link text-decoration-none color-purple" asp-area="" asp-controller="Log" asp-action="GetPenaltiesAuditHistory" asp-route-id="@ViewData["SelectedPenalty"]">See more</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        readonlyField(".date-filter");
+
+        if ($('#getPenaltyHistoryByIdModal').length && $('#getPenaltyHistoryByIdModal').is(':hidden'))
+        {
+            $('#getPenaltyHistoryByIdModal').modal('show');
+        }
+
+        $('#log-operation-select').on("change", function ()
+        {
+            event.preventDefault();
+
+            var logOperation = $(this).val();
+            const penaltyId = $("#penaltyLogTable").data('id');
+
+            $.ajax({
+                url: '@Url.Action("GetPenaltyAuditHistoryByPenaltyId", "Log")',
+                data: { id: penaltyId, logOperation: logOperation, needJson: true },
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response)
+                {
+                    let tableBody = $("#penaltyLogTable tbody");
+                    if (response && response.length > 0)
+                    {
+                        tableBody.empty();
+
+                        response.forEach(function (item)
+                        {
+                            let row = `<tr class="bg-color-default">`;
+
+                            if (item.operation != null && item.operation != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                        <div class="status-clip ${item.operation != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.operationBgColor}; --textcolor:${item.operationColor};">
+                                            ${item.operation}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            if (item.logType != null && item.logType != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                        <div class="status-clip ${item.logType != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.logTypeBgColor}; --textcolor:${item.logTypeColor};">
+                                            ${item.logType}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            row += `
+                                    <td class="text-center">${formatDate(item.logTime)}</td>
+                                    <td class="text-center">${item.performedBy ?? "-"}</td>
+                                    <td class="text-center">${item.userName ?? "-"}</td>`;
+
+                            if (item.statusLabel != null && item.statusLabel != undefined)
+                            {
+                                row += `
+                                    <td class="text-center">
+                                            <div class="status-clip ${item.statusLabel != null ? "dynamic-style" : "default-style"}"
+                                             style="--bgcolor:${item.statusLabelBgColor}; --textcolor:${item.statusLabelColor};">
+                                                ${item.statusLabel}
+                                        </div>
+                                    </td>`;
+                            }
+                            else
+                            {
+                                row += `<td class="text-center"> "-" </td>`;
+                            }
+
+                            row += `
+                                    <td class="text-center">${item.transectionDueDate ?? "-"}</td>
+                                    <td class="text-center">${item.penaltyTypeName ?? "-"}</td>
+                                    <td class="truncate-description-container" data-max-length="50" data-bs-toggle="tooltip" data-bs-placement="right" title="${item.description}">${item.description ?? "-"}</td>
+                                    <td class="text-center">${item.amount?.toFixed(2) ?? "-"}`;
+
+                            if (item.amount != null && item.amount != undefined)
+                            {
+                                row += `<i class="fa fa-inr" aria-hidden="true"></i>`;
+                            }
+                            
+                            row += `
+                                    </td>
+                                    <td class="text-center">${item.overDueDays ?? "-"}`;
+
+                            if (item.overDueDays != null && item.overDueDays != undefined)
+                            {
+                                row += ` Days`;
+                            }
+
+                            row += `
+                                    </td>
+                                </tr>`;
+
+                            tableBody.append(row);
+                        });
+                    } else
+                    {
+                        tableBody.html('<tr><td colspan="11" class="text-center border-0">No records found</td></tr>');
+                    }
+                }
+            });
+        });
+    });
+</script>
