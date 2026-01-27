@@ -8,7 +8,8 @@ public class GetPenaltyDtoValidator : AbstractValidator<GetPenaltyDto>
     public GetPenaltyDtoValidator()
     {
         RuleFor(penalty => penalty.Id)
-            .NotEmpty().WithMessage("Penalty Id is required");
+            .NotEmpty().WithMessage("Penalty Id is required")
+            .GreaterThan(0).WithMessage("Penalty Id must be positive number greater than zero");
 
         RuleFor(penalty => penalty.StatusLabel)
             .NotEmpty().WithMessage("Status Label is required")
@@ -37,8 +38,8 @@ public class GetPenaltyDtoValidator : AbstractValidator<GetPenaltyDto>
             .Must(x => x == null || x > 0).WithMessage("OverDueDays must be null or greater than 0");
 
         RuleFor(book => book.TransectionDueDate)
-            .Must(date => DateTimeOffset.TryParse(date.ToString(), out _)).WithMessage("Transection Due date must be in a valid format.")
-            .Must(date => date.HasValue && date.Value.Date <= DateTimeOffset.UtcNow).WithMessage("Transection due date cannot be in the future.");
+            .Must(date => !date.HasValue || DateTimeOffset.TryParse(date.ToString(), out _)).WithMessage("Transection Due Date must be in a valid format.")
+            .Must(date => !date.HasValue || date.Value.Date <= DateTimeOffset.UtcNow).WithMessage("Transection Due Date cannot be in the future.");
 
         RuleFor(penalty => penalty.IsRemoved)
             .Must(value => value == true || value == false).WithMessage("IsRemoved flag is required");

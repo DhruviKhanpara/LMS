@@ -6,6 +6,7 @@ using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -75,12 +76,12 @@ internal class TransectionService : ITransectionService
             .Where(x => x.UserId == authUserId);
 
         var activeTransection = await transectionQuery
-            .Where(x => !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId))
+            .Where(x => !StatusGroups.Transaction.Finalized.Contains(x.StatusId))
             .OrderByDescending(x => x.CreatedAt)
             .ProjectTo<GetUserTransectionDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
-        transectionQuery = transectionQuery.Where(x => new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId));
+        transectionQuery = transectionQuery.Where(x => StatusGroups.Transaction.Finalized.Contains(x.StatusId));
 
         var totalCount = await transectionQuery.CountAsync();
 
@@ -185,7 +186,7 @@ internal class TransectionService : ITransectionService
 
         await ValidateUserAvailability(userId: transection.UserId);
 
-        bool checkStatus = !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(transection.StatusId);
+        bool checkStatus = !StatusGroups.Transaction.Finalized.Contains(transection.StatusId);
 
         await ValidateBookAvailability(bookId: transection.BookId, userId: transection.UserId, checkStatus: checkStatus);
         if (checkStatus)
@@ -234,19 +235,19 @@ internal class TransectionService : ITransectionService
                 transection.RenewCount = 0;
         }
 
-        if (!new[] { (long)TransectionStatusEnum.ClaimedLost }.Contains(transection.StatusId) && transection.LostClaimDate is not null)
+        if (transection.StatusId != (long)TransectionStatusEnum.ClaimedLost && transection.LostClaimDate is not null)
         {
             _logger.LogWarning($"Request Interrupted: LostClaimDate is found while transection status is not from the (ClaimedLost) while adding transections.");
             transection.LostClaimDate = null;
         }
 
-        if (!new[] { (long)TransectionStatusEnum.Renewed }.Contains(transection.StatusId) && transection.RenewDate is not null)
+        if (transection.StatusId != (long)TransectionStatusEnum.Renewed && transection.RenewDate is not null)
         {
             _logger.LogWarning($"Request Interrupted: RenewDate is found while transection status is not from the (Renewed) while adding transections.");
             transection.RenewDate = null;
         }
 
-        if (new[] { (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.Cancelled }.Contains(transection.StatusId) && transection.ReturnDate == null)
+        if (StatusGroups.Transaction.RequiringReturnDate.Contains(transection.StatusId) && transection.ReturnDate == null)
         {
             _logger.LogWarning($"Request Interrupted: ReturnDate is not found while transection status is from (Return, cancled) while adding transections.");
             transection.ReturnDate = transection.BorrowDate;
@@ -293,8 +294,8 @@ internal class TransectionService : ITransectionService
 
         await ValidateUserAvailability(userId: existTransection.UserId);
 
-        bool checkStatus = new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(existTransection.StatusId)
-            && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(transection.StatusId);
+        bool checkStatus = StatusGroups.Transaction.Finalized.Contains(existTransection.StatusId)
+            && !StatusGroups.Transaction.Finalized.Contains(transection.StatusId);
 
         await ValidateBookAvailability(bookId: existTransection.BookId, userId: existTransection.UserId, checkStatus: checkStatus);
 
@@ -334,7 +335,7 @@ internal class TransectionService : ITransectionService
         if (transection.RenewCount > await GetRenewLimit())
             throw new BadRequestException("User's renew limit is over not can't renew the book need to return and re-issue it.");
 
-        if (new[] { (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.Cancelled }.Contains(transection.StatusId) && transection.ReturnDate == null)
+        if (StatusGroups.Transaction.RequiringReturnDate.Contains(transection.StatusId) && transection.ReturnDate == null)
             throw new BadRequestException("Return date is required");
 
         if (transection.DueDate is null || transection.DueDate < transection.BorrowDate)
@@ -380,7 +381,7 @@ internal class TransectionService : ITransectionService
         if (authRole.ToLower().Equals(nameof(RoleListEnum.User), StringComparison.InvariantCultureIgnoreCase) && existBookTransection.UserId != authUserId)
             throw new BadRequestException("you can't intract with others transection as a user");
 
-        if (!new[] { (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.ClaimedLost }.Contains(existBookTransection.StatusId) && new[] { TransectionActionEnum.Return, TransectionActionEnum.Cancel, TransectionActionEnum.Delete }.Contains(transectionAction))
+        if (!StatusGroups.Transaction.Finalized.Contains(existBookTransection.StatusId) && StatusGroups.TransactionAction.InvalidAfterAllocation.Contains(transectionAction))
             throw new BadRequestException("This transection occupied a book first return that");
 
         var haspPenalty = (await _repositoryManager.TransectionRepository.GetByIdAsync(id).ProjectTo<GetTransectionDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync())?.HasPenalty ?? false;
@@ -503,7 +504,7 @@ internal class TransectionService : ITransectionService
             .FirstOrDefaultAsync();
 
         var transactionCount = await _repositoryManager.TransectionRepository
-            .FindByCondition(x => x.IsActive && x.UserId == userId && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId))
+            .FindByCondition(x => x.IsActive && x.UserId == userId && !StatusGroups.Transaction.Finalized.Contains(x.StatusId))
             .LongCountAsync();
 
         if (userMembership is null)
@@ -515,7 +516,7 @@ internal class TransectionService : ITransectionService
     private async Task<bool> HasUserAlreadyBorrowedBook(long userId, long bookId, long? id = null)
     {
         return await _repositoryManager.TransectionRepository
-            .AnyAsync(x => x.IsActive && (id == null || x.Id != id) && x.UserId == userId && x.BookId == bookId && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId));
+            .AnyAsync(x => x.IsActive && (id == null || x.Id != id) && x.UserId == userId && x.BookId == bookId && !StatusGroups.Transaction.Finalized.Contains(x.StatusId));
     }
 
     private async Task<long> GetBorrowDueDays()

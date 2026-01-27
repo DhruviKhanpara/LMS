@@ -4,6 +4,7 @@ using LMS.Application.Contracts.DTOs.Home;
 using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Core.Enums;
@@ -54,7 +55,7 @@ internal class HomeService : IHomeService
         var notifications = transectionData
             .Include(x => x.Book)
             .AsEnumerable()
-            .Where(x => x.StatusId == (long)TransectionStatusEnum.Overdue || ((x.DueDate - DateTimeOffset.UtcNow).Days <= 2 && new[] { (long)TransectionStatusEnum.Renewed, (long)TransectionStatusEnum.Borrowed }.Contains(x.StatusId)))
+            .Where(x => x.StatusId == (long)TransectionStatusEnum.Overdue || ((x.DueDate - DateTimeOffset.UtcNow).Days <= 2 && StatusGroups.Transaction.CheckedOut.Contains(x.StatusId)))
             .Select(x => new NotificationData
             {
                 EventType = "Book Check-out",
@@ -199,11 +200,11 @@ internal class HomeService : IHomeService
         {
             User = _httpContext!.GetUserName(),
             TotalActiveMembership = userMembershipData,
-            TotalActiveCheckout = await transectionData.Where(x => new[] { (long)TransectionStatusEnum.Borrowed, (long)TransectionStatusEnum.Renewed }.Contains(x.StatusId)).LongCountAsync(),
+            TotalActiveCheckout = await transectionData.Where(x => StatusGroups.Transaction.CheckedOut.Contains(x.StatusId)).LongCountAsync(),
             TotalOverdueCheckout = await transectionData.Where(x => x.StatusId == (long)TransectionStatusEnum.Overdue).LongCountAsync(),
             TotalLostBooksFromCheckouts = await transectionData.Where(x => x.StatusId == (long)TransectionStatusEnum.ClaimedLost).LongCountAsync(),
             TotalCheckout = await transectionData.LongCountAsync(),
-            TotalActiveReservation = await reservationData.Where(x => new[] { (long)ReservationsStatusEnum.Reserved, (long)ReservationsStatusEnum.Allocated }.Contains(x.StatusId)).LongCountAsync(),
+            TotalActiveReservation = await reservationData.Where(x => StatusGroups.Reservation.Active.Contains(x.StatusId)).LongCountAsync(),
             TotalReservation = await reservationData.LongCountAsync(),
             UnPaidPenaltyAmount = unpaidPenaltyAmount,
             RecentCheckOuts = await transectionData.Where(x => x.StatusId != (long)TransectionStatusEnum.Overdue).Take(5).ProjectTo<RecentCheckOuts>(_mapper.ConfigurationProvider).ToListAsync(),

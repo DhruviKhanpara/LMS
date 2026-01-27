@@ -158,7 +158,10 @@
         removeSingleDropdownValueAttr('#updateReservationForm #update-reservation-form-statusId');
         setSelect2OptionAccessibility('#updateReservationForm #update-reservation-form-statusId', ["@allocateStatusId"], true);
 
-        if (!('@Model.IsAllocated'.toLowerCase() == 'true' && @Model.StatusId == @allocateStatusId))
+        var isAllocated = @Html.Raw(Json.Serialize(Model.IsAllocated));
+        var statusId = @Html.Raw(Json.Serialize(Model.StatusId));
+
+        if (!(isAllocated === true && statusId === allocateStatusId))
         {
             readonlyField("#updateReservationForm #IsAllocated");
         }

@@ -287,10 +287,14 @@
     {
         $(".pagination-btn").removeClass("btn-submit-disabled");
         $(".pagination-btn").removeClass("btn-submit-disabled-border");
-        if (@Model.Pagination.PageNumber === 1)
+
+        var pageNumber = @Html.Raw(Json.Serialize(Model.Pagination.PageNumber));
+        var pageCount = @Html.Raw(Json.Serialize(Model.Pagination.PageCount));
+
+        if (pageNumber === 1)
             toggleButtonState('.pagination-btn.prev', true, 'bg-color-purple text-light');
 
-        if (@Model.Pagination.PageNumber === @Model.Pagination.PageCount)
+        if (pageNumber === pageCount)
             toggleButtonState('.pagination-btn.next', true, 'bg-color-purple text-light');
     }
 

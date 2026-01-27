@@ -6,6 +6,7 @@ using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -76,12 +77,12 @@ internal class ReservationService : IReservationService
             .Where(x => x.UserId == authUserId);
 
         var activeReservation = await reservationQuery
-            .Where(x => !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(x.StatusId))
+            .Where(x => !StatusGroups.Reservation.Finalized.Contains(x.StatusId))
             .OrderByDescending(x => x.CreatedAt)
             .ProjectTo<GetUserReservationDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
-        reservationQuery = reservationQuery.Where(x => new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(x.StatusId));
+        reservationQuery = reservationQuery.Where(x => StatusGroups.Reservation.Finalized.Contains(x.StatusId));
 
         var totalCount = await reservationQuery.CountAsync();
 
@@ -180,7 +181,7 @@ internal class ReservationService : IReservationService
 
         await ValidateUserAvailability(userId: reservation.UserId);
 
-        bool checkStatus = !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(reservation.StatusId);
+        bool checkStatus = !StatusGroups.Reservation.Finalized.Contains(reservation.StatusId);
 
         await ValidateBookAvailability(bookId: reservation.BookId, checkStatus: checkStatus);
 
@@ -248,8 +249,8 @@ internal class ReservationService : IReservationService
 
         await ValidateUserAvailability(userId: reservation.UserId);
 
-        bool checkStatus = new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(existReservation.StatusId)
-            && !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(reservation.StatusId);
+        bool checkStatus = StatusGroups.Reservation.Finalized.Contains(existReservation.StatusId)
+            && !StatusGroups.Reservation.Finalized.Contains(reservation.StatusId);
 
         await ValidateBookAvailability(bookId: reservation.BookId, checkStatus: checkStatus);
 
@@ -354,7 +355,7 @@ internal class ReservationService : IReservationService
 
         bool hasAllocation = existBookReservation.IsAllocated
             && existBookReservation.StatusId == (long)ReservationsStatusEnum.Allocated
-            && new[] { ReservationActionEnum.Cancel, ReservationActionEnum.Delete, ReservationActionEnum.Transfer }.Contains(reservationAction);
+            && StatusGroups.ReservationAction.RequiringResourceRelease.Contains(reservationAction);
 
         switch (reservationAction)
         {
@@ -445,7 +446,7 @@ internal class ReservationService : IReservationService
                 }
             }
 
-            var eligibleBooks = bookDictionary.Values.Where(b => b.IsActive && new[] { (long)BookStatusEnum.Available, (long)BookStatusEnum.Reserved }.Contains(b.StatusId)).ToDictionary(b => b.Id);
+            var eligibleBooks = bookDictionary.Values.Where(b => b.IsActive && StatusGroups.Book.AvailableForAction.Contains(b.StatusId)).ToDictionary(b => b.Id);
 
             foreach (var book in eligibleBooks.Values)
             {
@@ -453,7 +454,7 @@ internal class ReservationService : IReservationService
                         && x.IsActive
                         && !x.IsAllocated
                         && x.AllocateAfter <= DateTimeOffset.UtcNow
-                        && !new[] { (long)ReservationsStatusEnum.Fulfilled, (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Allocated }.Contains(x.StatusId))
+                        && !StatusGroups.Reservation.NonPendingAllocation.Contains(x.StatusId))
                     .OrderBy(x => x.ReservationDate)
                     .Take((int)book.AvailableCopies)
                     .Select(x => x.Id)
@@ -493,7 +494,7 @@ internal class ReservationService : IReservationService
             .Where(x => x.IsActive
                 && !x.IsAllocated
                 && x.AllocateAfter <= DateTimeOffset.UtcNow
-                && !new[] { (long)ReservationsStatusEnum.Fulfilled, (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Allocated }.Contains(x.StatusId))
+                && !StatusGroups.Reservation.NonPendingAllocation.Contains(x.StatusId))
             .Where(x => x.Book.StatusId == (long)BookStatusEnum.Available)
             .ToListAsync();
 
@@ -580,7 +581,7 @@ internal class ReservationService : IReservationService
 
     private async Task ValidateBookAvailability(long bookId, bool checkStatus)
     {
-        if (!(await _repositoryManager.BooksRepository.AnyAsync(x => x.IsActive && x.Id == bookId && (!checkStatus || !new[] { (long)BookStatusEnum.Removed }.Contains(x.StatusId)))))
+        if (!(await _repositoryManager.BooksRepository.AnyAsync(x => x.IsActive && x.Id == bookId && (!checkStatus || x.StatusId != (long)BookStatusEnum.Removed))))
             throw new BadRequestException("This book is not available");
     }
 
@@ -592,7 +593,7 @@ internal class ReservationService : IReservationService
             .FirstOrDefaultAsync();
 
         var reservationCount = await _repositoryManager.ReservationRepository
-            .FindByCondition(x => x.IsActive && x.UserId == userId && !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(x.StatusId))
+            .FindByCondition(x => x.IsActive && x.UserId == userId && !StatusGroups.Reservation.Finalized.Contains(x.StatusId))
             .LongCountAsync();
 
         if (userMembership is null)
@@ -604,13 +605,13 @@ internal class ReservationService : IReservationService
     private async Task<bool> HasUserAlreadyReservedBook(long userId, long bookId, long? id = null)
     {
         return await _repositoryManager.ReservationRepository
-            .AnyAsync(x => x.IsActive && (id == null || x.Id != id) && x.UserId == userId && x.BookId == bookId && !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(x.StatusId));
+            .AnyAsync(x => x.IsActive && (id == null || x.Id != id) && x.UserId == userId && x.BookId == bookId && !StatusGroups.Reservation.Finalized.Contains(x.StatusId));
     }
 
     private async Task<bool> HasUserAlreadyBorrowedBook(long userId, long bookId)
     {
         return await _repositoryManager.TransectionRepository
-            .AnyAsync(x => x.IsActive && x.UserId == userId && x.BookId == bookId && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId));
+            .AnyAsync(x => x.IsActive && x.UserId == userId && x.BookId == bookId && !StatusGroups.Transaction.Finalized.Contains(x.StatusId));
     }
 
     private async Task MoveFreeBookToRack(long bookId)
@@ -620,7 +621,7 @@ internal class ReservationService : IReservationService
         if (book is not null)
         {
             book.AvailableCopies++;
-            if (new[] { (long)BookStatusEnum.Available, (long)BookStatusEnum.Reserved, (long)BookStatusEnum.CheckedOut }.Contains(book.StatusId))
+            if (StatusGroups.Book.InCirculation.Contains(book.StatusId))
             {
                 book.StatusId = (long)BookStatusEnum.Available;
             }

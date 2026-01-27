@@ -259,8 +259,9 @@
         var isReserve = @Html.Raw(Json.Serialize(Model.IsReserved));
         var isBorrow = @Html.Raw(Json.Serialize(Model.IsBorrowed));
         var isAllocated = @Html.Raw(Json.Serialize(Model.IsAllocated));
+        var statusLabel = @Html.Raw(Json.Serialize(Model.StatusLabel.ToLower()));
 
-        if (canBorrow === null || canBorrow === false || isBorrow == true || (canBorrow === true && isAllocated === false && @Model.StatusLabel.ToLower() != @availableStatus.ToLower()))
+        if (canBorrow === null || canBorrow === false || isBorrow == true || (canBorrow === true && isAllocated === false && statusLabel != "@availableStatus.ToLower()"))
         {
             toggleButtonState('#book-borrow-btn', true, 'bg-color-purple text-light');
         }

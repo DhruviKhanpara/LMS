@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Test", "LMS.Test\LMS.Test.csproj", "{687B739F-9A90-473B-B6DD-12DC49B15429}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{55615348-A901-422B-BDCA-D3B009C54B17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55615348-A901-422B-BDCA-D3B009C54B17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55615348-A901-422B-BDCA-D3B009C54B17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{687B739F-9A90-473B-B6DD-12DC49B15429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{687B739F-9A90-473B-B6DD-12DC49B15429}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{687B739F-9A90-473B-B6DD-12DC49B15429}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{687B739F-9A90-473B-B6DD-12DC49B15429}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
