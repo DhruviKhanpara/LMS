@@ -10,13 +10,13 @@ public class UserMembershipMappingMapperProfile : Profile
     public UserMembershipMappingMapperProfile()
     {
         CreateMap<UserMembershipMapping, GetUserMembershipDto>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""} {act.User.LastName ?? ""}".Trim()));
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()));
 
         CreateMap<UserMembershipMapping, ExportUserMembershipDto>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""} {act.User.LastName ?? ""}".Trim()));
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()));
 
         CreateMap<UserMembershipMapping, GetUserMembersipListDto>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""} {act.User.LastName ?? ""}".Trim()))
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()))
             .ForMember(dest => dest.IsRemoved, src => src.MapFrom(act => !act.IsActive))
             .ForMember(dest => dest.StatusLabel, src => src.MapFrom(act =>
                 act.EffectiveStartDate <= DateTimeOffset.UtcNow && act.ExpirationDate >= DateTimeOffset.UtcNow ? nameof(UserMembershipStatusEnum.Active) :

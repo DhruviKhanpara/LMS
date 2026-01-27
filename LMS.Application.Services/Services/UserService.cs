@@ -7,6 +7,7 @@ using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.ExternalServices;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -312,11 +313,11 @@ internal class UserService : IUserService
             throw new BadRequestException("You are not authorize to delete this account");
 
         if (await _repositoryManager.TransectionRepository
-            .AnyAsync(x => x.IsActive && x.UserId == id && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId)))
+            .AnyAsync(x => x.IsActive && x.UserId == id && !StatusGroups.Transaction.Finalized.Contains(x.StatusId)))
             throw new BadRequestException("Have occupied resources");
 
         if (await _repositoryManager.PenaltyRepository
-            .AnyAsync(x => x.IsActive && x.UserId == id && !new[] { (long)FineStatusEnum.UnPaid }.Contains(x.StatusId)))
+            .AnyAsync(x => x.IsActive && x.UserId == id && x.StatusId != (long)FineStatusEnum.UnPaid))
             throw new BadRequestException("Have unpaid penalty");
 
         if (existUser.RoleId == (long)RoleListEnum.Admin

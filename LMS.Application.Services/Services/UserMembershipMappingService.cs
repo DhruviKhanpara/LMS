@@ -43,10 +43,12 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
         var isLogin = long.TryParse(_httpContext!.GetUserId(), out long authUserId);
         var authUserRole = _httpContext!.GetUserRole();
 
+        isActive = authUserRole.Equals(RoleListEnum.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase) ? isActive : true;
+
         var userMembershipQuery = _repositoryManager.UserMembershipMappingRepository
-            .GetUserMembershipOrderByActiveStatus(isActive: authUserRole.Equals(RoleListEnum.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase) ? isActive : true)
+            .GetUserMembershipOrderByActiveStatus(isActive: isActive)
             .Where(x => (!userId.HasValue || x.UserId == (authUserRole.Equals(RoleListEnum.User.ToString(), StringComparison.InvariantCultureIgnoreCase) ? authUserId : userId))
-                && x.ExpirationDate.Date >= DateTimeOffset.UtcNow.Date);
+                && (isActive != true || x.ExpirationDate.Date >= DateTimeOffset.UtcNow.Date));
 
         var totalCount = await userMembershipQuery.CountAsync();
 
@@ -153,12 +155,12 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
         if (membership == null)
             throw new BadRequestException("Selected Membership not found");
 
-        var existUserMemberships = await _repositoryManager.UserMembershipMappingRepository.FindByCondition(x => x.UserId == userId && x.IsActive).ToListAsync();
+        var existUserMemberships = await _repositoryManager.UserMembershipMappingRepository.FindByCondition(x => x.UserId == userId && x.ExpirationDate.Date >= DateTimeOffset.UtcNow.Date && x.IsActive).ToListAsync();
 
         long maxActiveMembership = await GetMaxActiveMembership();
 
         if (existUserMemberships.Count() >= maxActiveMembership && !IsUpgradePlan)
-            throw new BadRequestException("Already have max number of plan can't add new one");
+            throw new BadRequestException("Already have max number of plan, can't add new one");
 
         if (!existUserMemberships.Any() && IsUpgradePlan)
             throw new BadRequestException("You haven't any active plan, Upgrade Plan doesn't work");
@@ -337,7 +339,7 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
         var isLogin = long.TryParse(_httpContext!.GetUserId(), out long authUserId);
 
         var expiredUserMemberships = await _repositoryManager.UserMembershipMappingRepository
-            .FindByCondition(x => x.IsActive && (forLogin == false || forLogin == true && x.Id == authUserId) && x.ExpirationDate <= DateTimeOffset.UtcNow)
+            .FindByCondition(x => x.IsActive && (forLogin == false || forLogin == true && x.UserId == authUserId) && x.ExpirationDate <= DateTimeOffset.UtcNow)
             .ToListAsync();
 
         if (expiredUserMemberships.Any())

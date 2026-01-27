@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LMS.Application.Contracts.DTOs;
 using LMS.Application.Contracts.DTOs.Books;
+using LMS.Application.Services.Constants;
 using LMS.Common.Helpers;
 using LMS.Core.Entities;
 using LMS.Core.Enums;
@@ -46,9 +47,9 @@ public class BookMapperProfile : Profile
             .ForMember(dest => dest.BookFiles, src => src.MapFrom(act => act.BookFileMappings.Where(i => i.IsActive)))
             .ForMember(dest => dest.TotalBorrowing, src => src.MapFrom(act => act.Transections.LongCount(i => i.IsActive && i.StatusId != (long)TransectionStatusEnum.Cancelled)))
             .ForMember(dest => dest.TotalReservation, src => src.MapFrom(act => act.Reservations.LongCount(i => i.IsActive)))
-            .ForMember(dest => dest.ActiveReservation, src => src.MapFrom(act => act.Reservations.LongCount(i => i.IsActive && i.IsAllocated && new[] { (long)ReservationsStatusEnum.Reserved, (long)ReservationsStatusEnum.Allocated }.Contains(i.StatusId))))
+            .ForMember(dest => dest.ActiveReservation, src => src.MapFrom(act => act.Reservations.LongCount(i => i.IsActive && i.IsAllocated && StatusGroups.Reservation.Active.Contains(i.StatusId))))
             .ForMember(dest => dest.RecentActivitiesByPeople, src => src.MapFrom(act =>
-                act.Transections.Where(i => i.IsActive && new[] { (long)TransectionStatusEnum.Borrowed, (long)TransectionStatusEnum.Renewed, (long)TransectionStatusEnum.Overdue }.Contains(i.StatusId))
+                act.Transections.Where(i => i.IsActive && StatusGroups.Transaction.Active.Contains(i.StatusId))
                 .Select(t => new
                 {
                     ProfilePhoto = t.User.ProfilePhoto,
@@ -56,7 +57,7 @@ public class BookMapperProfile : Profile
                     Label = t.Status.Label,
                     ActivityDate = t.BorrowDate
                 })
-                .Union(act.Reservations.Where(i => i.IsActive && i.IsAllocated && new[] { (long)ReservationsStatusEnum.Reserved, (long)ReservationsStatusEnum.Allocated }.Contains(i.StatusId))
+                .Union(act.Reservations.Where(i => i.IsActive && i.IsAllocated && StatusGroups.Reservation.Active.Contains(i.StatusId))
                 .Select(r => new
                 {
                     ProfilePhoto = r.User.ProfilePhoto,

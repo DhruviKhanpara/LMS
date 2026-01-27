@@ -95,7 +95,7 @@ public class BookController : Controller
 
         book.BookStatusList = Enum.GetValues(typeof(BookStatusEnum))
             .Cast<BookStatusEnum>()
-            .Where(x => !new[] { BookStatusEnum.Removed }.Contains(x))
+            .Where(x => x != BookStatusEnum.Removed)
             .Select(item => new SelectListItem
             {
                 Value = ((long)item).ToString(),
@@ -118,7 +118,7 @@ public class BookController : Controller
 
             book.BookStatusList = Enum.GetValues(typeof(BookStatusEnum))
                 .Cast<BookStatusEnum>()
-            .Where(x => !new[] { BookStatusEnum.Removed }.Contains(x))
+            .Where(x => x != BookStatusEnum.Removed)
                 .Select(item => new SelectListItem
                 {
                     Value = ((long)item).ToString(),
@@ -147,7 +147,7 @@ public class BookController : Controller
 
         book.BookStatusList = Enum.GetValues(typeof(BookStatusEnum))
             .Cast<BookStatusEnum>()
-            .Where(x => !new[] { BookStatusEnum.Removed }.Contains(x))
+            .Where(x => x != BookStatusEnum.Removed)
             .Select(item => new SelectListItem
             {
                 Value = ((long)item).ToString(),
@@ -176,7 +176,7 @@ public class BookController : Controller
 
             book.BookStatusList = Enum.GetValues(typeof(BookStatusEnum))
                 .Cast<BookStatusEnum>()
-                .Where(x => !new[] { BookStatusEnum.Removed }.Contains(x))
+                .Where(x => x != BookStatusEnum.Removed)
                 .Select(item => new SelectListItem
                 {
                     Value = ((long)item).ToString(),

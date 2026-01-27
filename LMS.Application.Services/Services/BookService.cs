@@ -6,6 +6,7 @@ using LMS.Application.Contracts.DTOs.Configs;
 using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -133,9 +134,9 @@ internal class BookService : IBookService
             .ProjectTo<GetUserMembershipDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
-        var reservationQuery = _repositoryManager.ReservationRepository.FindByCondition(x => x.UserId == authUserId && x.IsActive && !new[] { (long)ReservationsStatusEnum.Cancelled, (long)ReservationsStatusEnum.Fulfilled }.Contains(x.StatusId));
+        var reservationQuery = _repositoryManager.ReservationRepository.FindByCondition(x => x.UserId == authUserId && x.IsActive && !StatusGroups.Reservation.Finalized.Contains(x.StatusId));
 
-        var transectionQuery = _repositoryManager.TransectionRepository.FindByCondition(x => x.UserId == authUserId && x.IsActive && !new[] { (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId));
+        var transectionQuery = _repositoryManager.TransectionRepository.FindByCondition(x => x.UserId == authUserId && x.IsActive && !StatusGroups.Transaction.Finalized.Contains(x.StatusId));
 
         bool hasNotExceededLimit = await transectionQuery.LongCountAsync() < loginUserMembership?.BorrowLimit;
         bool isAvailableOrReservedByUser = book.StatusLabel == nameof(BookStatusEnum.Available)
@@ -231,7 +232,7 @@ internal class BookService : IBookService
         if (existBook == null)
             throw new BadRequestException("This Book is already not exist");
 
-        if (await _repositoryManager.TransectionRepository.AnyAsync(x => x.IsActive && x.BookId == id && !new[] { (long)TransectionStatusEnum.Returned, (long)TransectionStatusEnum.Cancelled, (long)TransectionStatusEnum.ClaimedLost }.Contains(x.StatusId)))
+        if (await _repositoryManager.TransectionRepository.AnyAsync(x => x.IsActive && x.BookId == id && !StatusGroups.Transaction.Finalized.Contains(x.StatusId)))
         {
             existBook.StatusId = (long)BookStatusEnum.Removed;
         }
