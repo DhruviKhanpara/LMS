@@ -201,98 +201,113 @@
 </div>
 
 <script>
-    let count = document.querySelectorAll(".count")
-    let arr = Array.from(count)
-
-    arr.map(function (item)
+    $(document).ready(function ()
     {
-        let startnumber = 0;
+        var successToastMessage = '@TempData["SuccessToast"]';
+        var errorToastMessage = '@TempData["ErrorToast"]';
 
-        function counterup()
+        if (successToastMessage)
         {
-            item.innerHTML = startnumber;
-            if (startnumber == item.dataset.number)
-            {
-                clearInterval(stop)
-            }
-            startnumber++;
+            toastr.success(successToastMessage, "Success");
+        }
+        else if (errorToastMessage)
+        {
+            toastr.error(errorToastMessage, "Error");
         }
 
-        let stop = setInterval(function ()
+        let count = document.querySelectorAll(".count")
+        let arr = Array.from(count)
+
+        arr.map(function (item)
         {
-            counterup()
-        }, 100)
+            let startnumber = 0;
 
-    });
-
-    $('#update-password-btn').off('click').on('click', function ()
-    {
-        event.preventDefault();
-        toggleButtonState('#update-password-btn', true, 'color-purple btn-submit');
-
-        $.ajax({
-            url: '@Url.Action("ChangePassword", "User")',
-            type: 'GET',
-            contentType: 'application/json',
-            success: function (result)
+            function counterup()
             {
-                $('#userProfileContainer').html(result);
+                item.innerHTML = startnumber;
+                if (startnumber == item.dataset.number)
+                {
+                    clearInterval(stop)
+                }
+                startnumber++;
             }
-        });
-        toggleButtonState('#update-password-btn', false, 'color-purple btn-submit');
-    });
 
-    $('#user-update-btn').off('click').on('click', function () 
-    {
-        event.preventDefault();
-        toggleButtonState('#user-update-btn', true, 'color-purple btn-submit');
-
-        $.ajax({
-            url: '@Url.Action("UpdateUser", "User")',
-            data: { id: @loninUserId },
-            type: 'GET',
-            contentType: 'application/json',
-            success: function (result)
+            let stop = setInterval(function ()
             {
-                $('#userProfileContainer').html(result);
-            }
+                counterup()
+            }, 100)
+
         });
-        toggleButtonState('#user-update-btn', false, 'color-purple btn-submit');
-    });
 
-    $('.user-profile-btn').off('click').on('click', function ()
-    {
-        event.preventDefault();
-        toggleButtonState('.user-profile-btn', true, 'color-purple btn-submit');
+        $('#update-password-btn').off('click').on('click', function ()
+        {
+            event.preventDefault();
+            toggleButtonState('#update-password-btn', true, 'color-purple btn-submit');
 
-        $.ajax({
-            url: $(this).attr("href"),
-            type: 'GET',
-            contentType: 'application/json',
-            success: function (result)
-            {
-                $('#userProfileContainer').html(result);
-            }
+            $.ajax({
+                url: '@Url.Action("ChangePassword", "User")',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (result)
+                {
+                    $('#userProfileContainer').html(result);
+                }
+            });
+            toggleButtonState('#update-password-btn', false, 'color-purple btn-submit');
         });
-        toggleButtonState('.user-profile-btn', false, 'color-purple btn-submit');
-    });
 
-    $('#libraryCard-download').off("click").on("click", function (event)
-    {
-        event.preventDefault();
-        $(this).addClass("btn-submit-disabled");
+        $('#user-update-btn').off('click').on('click', function ()
+        {
+            event.preventDefault();
+            toggleButtonState('#user-update-btn', true, 'color-purple btn-submit');
 
-        var userId = $(this).data('user-id');
-        var url = $(this).attr('href');
-                
-        const link = document.createElement('a');
-        link.href = url + "?userId=" + userId;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            $.ajax({
+                url: '@Url.Action("UpdateUser", "User")',
+                data: { id: @loninUserId },
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (result)
+                {
+                    $('#userProfileContainer').html(result);
+                }
+            });
+            toggleButtonState('#user-update-btn', false, 'color-purple btn-submit');
+        });
 
-        $(this).removeClass("btn-submit-disabled");
+        $('.user-profile-btn').off('click').on('click', function ()
+        {
+            event.preventDefault();
+            toggleButtonState('.user-profile-btn', true, 'color-purple btn-submit');
 
-        toastr.success("You get you Library card in the download folder.", "Success");
+            $.ajax({
+                url: $(this).attr("href"),
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (result)
+                {
+                    $('#userProfileContainer').html(result);
+                }
+            });
+            toggleButtonState('.user-profile-btn', false, 'color-purple btn-submit');
+        });
+
+        $('#libraryCard-download').off("click").on("click", function (event)
+        {
+            event.preventDefault();
+            $(this).addClass("btn-submit-disabled");
+
+            var userId = $(this).data('user-id');
+            var url = $(this).attr('href');
+
+            const link = document.createElement('a');
+            link.href = url + "?userId=" + userId;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            $(this).removeClass("btn-submit-disabled");
+
+            toastr.success("You get you Library card in the download folder.", "Success");
+        });
     });
 </script>

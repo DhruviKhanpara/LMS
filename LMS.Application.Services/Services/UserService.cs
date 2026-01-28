@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Collections;
 
 namespace LMS.Application.Services.Services;
@@ -31,8 +32,9 @@ internal class UserService : IUserService
     private readonly IValidationService _validationService;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
+    private readonly ILogger<UserService> _logger;
 
-    public UserService(IRepositoryManager repositoryManager, IExternalServiceManager externalServiceManager, IHttpContextAccessor httpContextAccessor, IMapper mapper, IValidationService validationService, IConfiguration configuration, TokenService tokenService)
+    public UserService(IRepositoryManager repositoryManager, IExternalServiceManager externalServiceManager, IHttpContextAccessor httpContextAccessor, IMapper mapper, IValidationService validationService, IConfiguration configuration, TokenService tokenService, ILogger<UserService> logger)
     {
         _repositoryManager = repositoryManager;
         _externalServiceManager = externalServiceManager;
@@ -41,6 +43,7 @@ internal class UserService : IUserService
         _configuration = configuration;
         _tokenService = tokenService;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<PaginatedResponseDto<T>> GetAllUserAsync<T>(int? pageSize = null, int? pageNumber = null, string? orderBy = null, bool? isActive = null) where T : class
@@ -153,41 +156,76 @@ internal class UserService : IUserService
     {
         _validationService.Validate<ChangePasswordDto>(user);
 
-        if (!await _repositoryManager.UserRepository.AnyAsync(x => x.Email.ToLower() == user.EmailOrUsername!.ToLower() || x.Username.ToLower() == user.EmailOrUsername.ToLower() && x.IsActive))
-            throw new BadRequestException("Invalid Email or Username");
+        if (user.UserId.HasValue && string.IsNullOrEmpty(user.EmailOrUsername))
+            throw new BadRequestException("Email or Username is required for change password");
+
+        var isLogin = long.TryParse(_httpContext!.GetUserId(), out long authUserId);
+        var authUserRole = _httpContext!.GetUserRole();
+
+        if (!isLogin && user.UserId.HasValue)
+        {
+            _logger.LogWarning("Unauthenticated request attempted to change password with UserId");
+            throw new BadRequestException("Invalid request");
+        }
+
+        bool isLibrarian = authUserRole.Equals(RoleListEnum.Librarian.ToString(), StringComparison.InvariantCultureIgnoreCase);
+        bool isUser = authUserRole.Equals(RoleListEnum.User.ToString(), StringComparison.InvariantCultureIgnoreCase);
+        bool isAdmin = authUserRole.Equals(RoleListEnum.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase);
 
         var existUser = await _repositoryManager.UserRepository
-            .FindByCondition(x => x.Email.ToLower() == user.EmailOrUsername!.ToLower() || x.Username.ToLower() == user.EmailOrUsername.ToLower() && x.IsActive)
+            .FindByCondition(x => x.IsActive &&
+                (user.UserId.HasValue
+                ? x.Id == user.UserId
+                : (x.Email.ToLower() == user.EmailOrUsername.ToLower() || x.Username.ToLower() == user.EmailOrUsername.ToLower())))
             .FirstOrDefaultAsync();
 
         if (existUser == null)
             throw new BadRequestException("User is not Found");
 
-        var isLogin = long.TryParse(_httpContext!.GetUserId(), out long authUserId);
-        var authUserRole = _httpContext!.GetUserRole();
+        if (isLogin)
+        {
+            if (!user.UserId.HasValue && existUser.Id != authUserId)
+            {
+                _logger.LogWarning($"Request from {authUserRole} account (user ID: {authUserId}) attempted to change password without a valid userId selected.");
+                throw new BadRequestException("An internal issue occurred. Please make sure your account is correctly loaded and try again. If the problem persists, contact support.");
+            }
+            if (user.UserId.HasValue && existUser.Id == authUserId)
+            {
+                _logger.LogWarning($"Request from {authUserRole} account (user ID: {authUserId}) provided userId for their own password change.");
+                throw new BadRequestException("To change your own password, please use the profile settings.");
+            }
+        }
 
-        bool isLibrarian = authUserRole.Equals(RoleListEnum.Librarian.ToString(), StringComparison.InvariantCultureIgnoreCase);
-        bool isUser = authUserRole.Equals(RoleListEnum.User.ToString(), StringComparison.InvariantCultureIgnoreCase);
-        bool isAdmin = authUserRole.Equals(RoleListEnum.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase);
-        bool hasDifferentRoleOrId = existUser.RoleId != (long)RoleListEnum.User || existUser.Id != authUserId;
-        bool isUnauthorizedUser = isUser && existUser.Id != authUserId;
-
-        if (isLogin && (isUnauthorizedUser || (isLibrarian && hasDifferentRoleOrId)))
-            throw new BadRequestException("You don't have an permission for update this user password");
-
+        if (existUser.Email.ToLower() != user.EmailOrUsername.ToLower() && existUser.Username.ToLower() != user.EmailOrUsername.ToLower())
+            throw new BadRequestException("Invalid Email or Username");
+        
+        bool canChangeWithoutOldPassword = isAdmin && user.UserId.HasValue && user.UserId != authUserId;
+        
+        if (isLogin && isUser && existUser.Id != authUserId)
+            throw new BadRequestException("You don't have permission to change this user's password");
+        
+        if (isLogin && isLibrarian)
+        {
+            bool isChangingOwnPassword = existUser.Id == authUserId;
+            bool isChangingRegularUser = existUser.RoleId == (long)RoleListEnum.User;
+        
+            if (!isChangingOwnPassword && !isChangingRegularUser)
+                throw new BadRequestException("Librarians can only change regular user passwords or their own password");
+        }
+        
         if (user.NewPassword != user.ConfirmPassword)
-            throw new BadRequestException("Password and ConfirmPassword are different");
-
-        if (!((isLibrarian && existUser.RoleId == (long)RoleListEnum.User) || isAdmin) && string.IsNullOrWhiteSpace(user.Password))
-            throw new BadRequestException("Password is Required");
-
-        if (user.Password != null && !PasswordHasher.VerifyPassword(password: user.Password, passwordHash: existUser.PasswordHash, passwordSolt: existUser!.PasswordSolt))
-            throw new BadRequestException("Invalid credentials, may your password is wrong");
-
-        PasswordHasher.CreatePasswordHash(user.NewPassword!, out byte[] passwordHash, out byte[] passwordSolt);
+            throw new BadRequestException("New password and confirm password do not match");
+        
+        if (!canChangeWithoutOldPassword && string.IsNullOrWhiteSpace(user.Password))
+            throw new BadRequestException("Current password is required");
+        
+        if (user.Password != null && !PasswordHasher.VerifyPassword(password: user.Password, passwordHash: existUser.PasswordHash, passwordSolt: existUser.PasswordSolt))
+            throw new BadRequestException("Current password is incorrect");
+        
+        PasswordHasher.CreatePasswordHash(user.NewPassword!, out byte[] passwordHash, out byte[] passwordSolt);   
         existUser.PasswordHash = passwordHash;
         existUser.PasswordSolt = passwordSolt;
-
+        
         _repositoryManager.UserRepository.Update(entity: existUser);
         await _repositoryManager.UnitOfWork.SaveChangesAsync();
     }
