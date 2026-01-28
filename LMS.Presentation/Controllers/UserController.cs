@@ -294,7 +294,7 @@ public class UserController : Controller
 
         await _serviceManager.UserService.ChangePasswordAsync(user: user);
 
-        _toast.AddSuccessToastMessage("Password update successfully");
+        TempData["SuccessToast"] = "Password update successfully";
 
         if (User.Identity!.IsAuthenticated)
             return Json(new { success = true, visit = Request.Headers["Referer"].ToString() });
@@ -305,9 +305,9 @@ public class UserController : Controller
     [HttpGet]
     [Route("user/auth-change-user-password")]
     [AuthorizeRoles(RoleListEnum.Librarian, RoleListEnum.Admin)]
-    public IActionResult AuthChangePassword()
+    public IActionResult AuthChangePassword(long id)
     {
-        ChangePasswordDto user = new ChangePasswordDto();
+        ChangePasswordDto user = new ChangePasswordDto() { UserId = id };
         return View(user);
     }
 

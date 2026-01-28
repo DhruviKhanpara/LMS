@@ -2,6 +2,7 @@
 
 public class ChangePasswordDto
 {
+    public long? UserId { get; set; } = null;
     public string EmailOrUsername { get; set; } = null!;
     public string? Password { get; set; }
     public string NewPassword { get; set; } = null!;

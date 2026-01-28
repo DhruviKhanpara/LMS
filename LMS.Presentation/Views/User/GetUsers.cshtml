@@ -99,10 +99,11 @@
                                             title="Delete">
                                         <i class="bi bi-trash3"></i></a>
 
-                                        <a class="color-purple bi-hover-bold user-action-btn"
+                                        <a class="color-purple bi-hover-bold user-actionById-btn"
                                             asp-area=""
                                             asp-controller="User"
                                             asp-action="AuthChangePassword" 
+                                            data-user-id="@item.Id"
                                             data-bs-toggle="tooltip" 
                                             data-bs-placement="right" 
                                             title="Update password">
@@ -356,34 +357,13 @@
             $(this).removeClass("btn-submit-disabled");
         });
 
-        $('.user-details-table .user-action-btn').off("click").on("click", function (event)
-        {
-            event.preventDefault();
-            $(this).addClass("btn-submit-disabled")
-            
-            $.ajax({
-                url: $(this).attr("href"),
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (result)
-                {
-                    $('#userContainer').html(result);
-                }
-            });
-
-            $(this).removeClass("btn-submit-disabled");
-        });
-
         $('.libraryCard-download').off("click").on("click", function (event)
         {
-            console.log("hry");
             event.preventDefault();
             $(this).addClass("btn-submit-disabled");
 
             var userId = $(this).data('user-id');
             var url = $(this).attr('href');
-
-            console.log(userId);
 
             const link = document.createElement('a');
             link.href = url + "?userId=" + userId;
