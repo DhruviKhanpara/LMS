@@ -137,7 +137,7 @@ internal class UserService : IUserService
         if (!PasswordHasher.VerifyPassword(password: user.Password!, passwordHash: existUser!.PasswordHash, passwordSolt: existUser!.PasswordSolt))
             throw new BadRequestException("Invalid credentials, may your password is wrong");
 
-        var profilePath = existUser!.ProfilePhoto is not null ? FileService.ConvertToRelativePath(existUser!.ProfilePhoto) : existUser!.ProfilePhoto;
+        var profilePath = existUser!.ProfilePhoto is not null ? "/" + existUser!.ProfilePhoto.Replace("\\", "/") : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s";
 
         string token = _tokenService.CreateToken(email: existUser!.Email, role: Enum.GetName(typeof(RoleListEnum), existUser!.RoleId) ?? "", id: existUser!.Id, name: existUser!.FirstName, profilePhoto: profilePath);
 
@@ -402,7 +402,7 @@ internal class UserService : IUserService
 
         var replacements = new Dictionary<string, string>
         {
-            { "{{ProfilePhoto}}", !string.IsNullOrWhiteSpace(user.ProfilePhoto) ? new Uri(Path.GetFullPath(user.ProfilePhoto)).AbsoluteUri : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s" },
+            { "{{ProfilePhoto}}", !string.IsNullOrWhiteSpace(user.ProfilePhoto) ? new Uri(FileService.GetFullFilePath(user.ProfilePhoto)).AbsoluteUri : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s" },
             { "{{UserName}}", userName },
             { "{{LibraryCardNo}}", user.LibraryCardNumber ?? "" },
             { "{{JoiningDate}}", user.JoiningDate.ToString("yyyy-MM-dd") },
@@ -448,7 +448,7 @@ internal class UserService : IUserService
                 .FirstOrDefaultAsync())?
                 .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
-        await FileService.MoveFileToArchive(sourceFileDirectory: profilePhotoPath, archiveDirectory: archiveDirectory);
+        await FileService.MoveFileToArchive(sourceFile: profilePhotoPath, archiveDirectory: archiveDirectory);
     }
 
     private async Task<string> GenerateLibraryCardNoForUser()

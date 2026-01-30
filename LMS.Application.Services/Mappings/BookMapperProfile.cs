@@ -70,7 +70,7 @@ public class BookMapperProfile : Profile
                 .Select(x => new RecentActivityByPeople
                 {
                     profilePhoto = !string.IsNullOrWhiteSpace(x.ProfilePhoto)
-                        ? FileService.ConvertToRelativePath(x.ProfilePhoto)
+                        ? "/" + x.ProfilePhoto
                         : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s",
                     Username = x.Username,
                     Activity = x.Label,

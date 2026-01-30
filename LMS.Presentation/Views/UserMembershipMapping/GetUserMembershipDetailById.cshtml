@@ -11,7 +11,7 @@
     <ul class="list-group">
         <li class="list-group-item">
             <b>@Html.DisplayNameFor(model => model.UserName)</b> :
-            @Html.DisplayFor(model => model.UserName)
+            <img src="@Model.UserProfilePhoto" alt="User" width="20" height="20" class="rounded-circle border-dark border-1 mx-1" /> @Html.DisplayFor(model => model.UserName)
         </li>
         <li class="list-group-item">
             <b>@Html.DisplayNameFor(model => model.MembershipType)</b> :
