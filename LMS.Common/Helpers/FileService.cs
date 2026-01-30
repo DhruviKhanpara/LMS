@@ -28,7 +28,7 @@ public static class FileService
         if (!Path.IsPathRooted(sourceFileDirectory))
         {
             string wwwRootPath = Path.GetFullPath("wwwroot");
-            sourceFileDirectory = Path.Combine(path1: wwwRootPath, path2: sourceFileDirectory);
+            sourceFileDirectory = Path.Combine(path1: wwwRootPath, path2: sourceFileDirectory.Replace('/', Path.DirectorySeparatorChar));
         }
 
         if (!Directory.Exists(path: sourceFileDirectory))
@@ -40,7 +40,7 @@ public static class FileService
 
         if (File.Exists(existingFilePath))
         {
-            await MoveFileToArchive(sourceFileDirectory: existingFilePath, archiveDirectory: archiveDirectory);
+            await MoveFileToArchive(sourceFile: existingFilePath, archiveDirectory: archiveDirectory);
         }
 
         var uniqueFileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
@@ -53,7 +53,12 @@ public static class FileService
                 await file.CopyToAsync(fileStream);
                 await fileStream.FlushAsync();
             }
-            return filePath;
+
+            // Return relative path for DB storage
+            string wwwRootPath = Path.GetFullPath("wwwroot");
+            string relativePath = Path.GetRelativePath(wwwRootPath, filePath);
+            string normalizedPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            return normalizedPath;
         }
         catch (IOException ex)
         {
@@ -72,19 +77,24 @@ public static class FileService
         return allowedExtensions.Contains(value: fileExtension);
     }
 
-    public static async Task MoveFileToArchive(string sourceFileDirectory, string archiveDirectory)
+    public static async Task MoveFileToArchive(string sourceFile, string archiveDirectory)
     {
-        if (string.IsNullOrWhiteSpace(sourceFileDirectory) || string.IsNullOrWhiteSpace(archiveDirectory))
+        if (string.IsNullOrWhiteSpace(sourceFile) || string.IsNullOrWhiteSpace(archiveDirectory))
             throw new ArgumentException("Source file path or archive folder cannot be null or empty.");
 
-        if (!File.Exists(path: sourceFileDirectory))
-            throw new FileNotFoundException("The source file does not exist.");
+        if (!Path.IsPathRooted(sourceFile))
+        {
+            string wwwRootPath = Path.GetFullPath("wwwroot");
+            sourceFile = Path.Combine(wwwRootPath, sourceFile.Replace('/', Path.DirectorySeparatorChar));
+        }
 
+        if (!File.Exists(path: sourceFile))
+            throw new FileNotFoundException("The source file does not exist.");
 
         if (!Path.IsPathRooted(archiveDirectory))
         {
             string wwwRootPath = Path.GetFullPath("wwwroot");
-            archiveDirectory = Path.Combine(path1: wwwRootPath, path2: archiveDirectory);
+            archiveDirectory = Path.Combine(path1: wwwRootPath, path2: archiveDirectory.Replace('/', Path.DirectorySeparatorChar));
         }
 
         if (!Directory.Exists(path: archiveDirectory))
@@ -92,19 +102,19 @@ public static class FileService
             Directory.CreateDirectory(path: archiveDirectory);
         }
 
-        var destinationFilePath = Path.Combine(path1: archiveDirectory, path2: Path.GetFileName(sourceFileDirectory));
+        var destinationFilePath = Path.Combine(path1: archiveDirectory, path2: Path.GetFileName(sourceFile));
         var uniqueFilePath = destinationFilePath;
 
         int count = 1;
         while (File.Exists(path: uniqueFilePath))
         {
-            uniqueFilePath = Path.Combine(archiveDirectory, $"{Path.GetFileNameWithoutExtension(sourceFileDirectory)}_({count}){Path.GetExtension(sourceFileDirectory)}");
+            uniqueFilePath = Path.Combine(archiveDirectory, $"{Path.GetFileNameWithoutExtension(sourceFile)}_({count}){Path.GetExtension(sourceFile)}");
             count++;
         }
 
         try
         {
-            File.Move(sourceFileName: sourceFileDirectory, destFileName: uniqueFilePath);
+            File.Move(sourceFileName: sourceFile, destFileName: uniqueFilePath);
         }
         catch (IOException ex)
         {
@@ -112,13 +122,11 @@ public static class FileService
         }
     }
 
-    public static string ConvertToRelativePath(string absolutePath)
+    public static string GetFullFilePath(string relativePath)
     {
         string wwwRootPath = Path.GetFullPath("wwwroot");
-
-        string relativePath = Path.GetRelativePath(wwwRootPath, absolutePath);
-
-        return "/" + relativePath.Replace("\\", "/");
+        string osPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        return Path.Combine(wwwRootPath, osPath);
     }
 
     public static byte[] ExportMultipleSheets(Dictionary<string, IEnumerable> sheetDataMap)

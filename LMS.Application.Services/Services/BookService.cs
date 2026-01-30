@@ -271,7 +271,7 @@ internal class BookService : IBookService
         {
             if (item.Label.Equals(nameof(BookFileTypeEnum.CoverPage), StringComparison.InvariantCultureIgnoreCase))
             {
-                await FileService.MoveFileToArchive(sourceFileDirectory: item.fileLocation, archiveDirectory: archiveDirectory);
+                await FileService.MoveFileToArchive(sourceFile: item.fileLocation, archiveDirectory: archiveDirectory);
                 item.IsActive = false;
             }
         }
@@ -289,7 +289,7 @@ internal class BookService : IBookService
         {
             if (item.Label.Equals(nameof(BookFileTypeEnum.BookPreview), StringComparison.InvariantCultureIgnoreCase))
             {
-                await FileService.MoveFileToArchive(sourceFileDirectory: item.fileLocation, archiveDirectory: archiveDirectory);
+                await FileService.MoveFileToArchive(sourceFile: item.fileLocation, archiveDirectory: archiveDirectory);
                 item.IsActive = false;
             }
         }
