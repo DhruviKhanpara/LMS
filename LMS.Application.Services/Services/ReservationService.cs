@@ -635,21 +635,21 @@ internal class ReservationService : IReservationService
 
     private async Task<long> GetDefaultAllocationDelayDays()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("DefalutAllocationDelayInDays").FirstOrDefaultAsync())?.KeyValue ?? "0", out long defaultAllocationDelayDays);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.DefaultAllocationDelayInDays).FirstOrDefaultAsync())?.KeyValue ?? "0", out long defaultAllocationDelayDays);
 
         return defaultAllocationDelayDays;
     }
 
     private async Task<long> GetAllocationDueDays()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("AllocationDueDays").FirstOrDefaultAsync())?.KeyValue ?? "0", out long allocationDueDays);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.AllocationDueDays).FirstOrDefaultAsync())?.KeyValue ?? "0", out long allocationDueDays);
 
         return allocationDueDays;
     }
 
     private async Task<long> GetTransferLimit()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("MaxTransferAllocationCount").FirstOrDefaultAsync())?.KeyValue ?? "0", out long transferLimit);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.MaxTransferAllocationCount).FirstOrDefaultAsync())?.KeyValue ?? "0", out long transferLimit);
         return transferLimit;
     }
 

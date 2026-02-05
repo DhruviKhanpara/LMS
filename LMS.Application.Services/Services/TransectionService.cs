@@ -521,13 +521,13 @@ internal class TransectionService : ITransectionService
 
     private async Task<long> GetBorrowDueDays()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("BorrowDueDays").FirstOrDefaultAsync())?.KeyValue ?? "0", out long borrowDueDays);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.BorrowDueDays).FirstOrDefaultAsync())?.KeyValue ?? "0", out long borrowDueDays);
         return borrowDueDays;
     }
 
     private async Task<long> GetRenewLimit()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("MaxRenewCount").FirstOrDefaultAsync())?.KeyValue ?? "0", out long renewLimit);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.MaxRenewCount).FirstOrDefaultAsync())?.KeyValue ?? "0", out long renewLimit);
         return renewLimit;
     }
     #endregion

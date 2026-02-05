@@ -615,16 +615,16 @@ internal class PenaltyService : IPenaltyService
     private async Task<(int previousLimitCarryoverDays, int membershipExpiryBufferDays)> GetBufferTimeFromConfig()
     {
         var bufferTime = await _repositoryManager.ConfigRepository
-            .GetByKeyNameListAsync(new List<string>() { "PreviousLimitCarryoverDays", "MembershipExpiryBufferDays" })
+            .GetByKeyNameListAsync(ConfigKeysConstants.BufferTimeConfigKeys)
             .ProjectTo<GetConfigsValueDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
         int.TryParse(bufferTime
-            .FirstOrDefault(x => x.KeyName.Equals("PreviousLimitCarryoverDays", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.PreviousLimitCarryoverDays, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "0", out int previousLimitCarryoverDays);
 
         int.TryParse(bufferTime
-            .FirstOrDefault(x => x.KeyName.Equals("MembershipExpiryBufferDays", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.MembershipExpiryBufferDays, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "0", out int membershipExpiryBufferDays);
 
         return (previousLimitCarryoverDays, membershipExpiryBufferDays);
@@ -638,7 +638,7 @@ internal class PenaltyService : IPenaltyService
     /// </returns>
     private async Task<long> GetBorrowDueDays()
     {
-        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("BorrowDueDays").FirstOrDefaultAsync())?.KeyValue ?? "0", out long borrowDueDays);
+        long.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.BorrowDueDays).FirstOrDefaultAsync())?.KeyValue ?? "0", out long borrowDueDays);
         return borrowDueDays;
     }
 
@@ -656,24 +656,24 @@ internal class PenaltyService : IPenaltyService
     private async Task<(int basePenaltyPerDay, int increaseValue, int intervalDays, string increaseType)> GetPenaltyInfoFromConfig()
     {
         var penaltyInfo = await _repositoryManager.ConfigRepository
-            .GetByKeyNameListAsync(new List<string>() { "BasePenaltyPerDay", "PenaltyIncreaseType", "PenaltyIncreaseValue", "PenaltyIncreaseDurationInDays" })
+            .GetByKeyNameListAsync(ConfigKeysConstants.PenaltyConfigKeys)
             .ProjectTo<GetConfigsValueDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
         int.TryParse(penaltyInfo
-            .FirstOrDefault(x => x.KeyName.Equals("BasePenaltyPerDay", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.BasePenaltyPerDay, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "0", out int basePenaltyPerDay);
 
         int.TryParse(penaltyInfo
-            .FirstOrDefault(x => x.KeyName.Equals("PenaltyIncreaseValue", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.PenaltyIncreaseValue, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "0", out int increaseValue);
 
         int.TryParse(penaltyInfo
-            .FirstOrDefault(x => x.KeyName.Equals("PenaltyIncreaseDurationInDays", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.PenaltyIncreaseDurationInDays, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "0", out int intervalDays);
 
         var increaseType = penaltyInfo
-            .FirstOrDefault(x => x.KeyName.Equals("PenaltyIncreaseType", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.PenaltyIncreaseType, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? "+";
 
         return (basePenaltyPerDay, increaseValue, intervalDays, increaseType);

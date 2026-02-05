@@ -4,6 +4,7 @@ using LMS.Application.Contracts.DTOs;
 using LMS.Application.Contracts.DTOs.Configs;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -77,13 +78,13 @@ internal class ConfigsService : IConfigsService
 
         configs.Add(new GetConfigsValueDto()
         {
-            KeyName = "BorrowLimit",
+            KeyName = ConfigKeysConstants.BorrowLimit,
             KeyValue = userMembershipLimits?.BorrowLimit.ToString() ?? ""
         });
 
         configs.Add(new GetConfigsValueDto()
         {
-            KeyName = "ReservationLimit",
+            KeyName = ConfigKeysConstants.ReservationLimit,
             KeyValue = userMembershipLimits?.ReservationLmit.ToString() ?? ""
         });
 

@@ -263,7 +263,7 @@ internal class BookService : IBookService
     private async Task<List<BookFileMapping>> ClearBookCoverPageStorage(List<BookFileMapping> bookFileMappings)
     {
         var archiveDirectory = (await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("BookCoverPageArchiveDirectoryPath")
+                .GetByKeyNameAsync(ConfigKeysConstants.BookCoverPageArchiveDirectoryPath)
                 .FirstOrDefaultAsync())?
                 .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
@@ -281,7 +281,7 @@ internal class BookService : IBookService
     private async Task<List<BookFileMapping>> ClearBookPreviewStorage(List<BookFileMapping> bookFileMappings)
     {
         var archiveDirectory = (await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("BookPreviewArchiveDirectoryPath")
+                .GetByKeyNameAsync(ConfigKeysConstants.BookPreviewArchiveDirectoryPath)
                 .FirstOrDefaultAsync())?
                 .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
@@ -299,22 +299,22 @@ internal class BookService : IBookService
     private async Task<BookFileMapping> AddBookCoverPage(IFormFile file)
     {
         var booksFileStorageInfo = await _repositoryManager.ConfigRepository
-               .GetByKeyNameListAsync(new List<string>() { "BookCoverPageDirectoryPath", "BookCoverPageArchiveDirectoryPath", "ImageFileExtentions" })
+               .GetByKeyNameListAsync(ConfigKeysConstants.BookCoverConfigKeys)
                .ProjectTo<GetConfigsValueDto>(_mapper.ConfigurationProvider)
                .ToListAsync();
 
         var archiveDirectory = booksFileStorageInfo
-                .FirstOrDefault(x => x.KeyName.Equals("BookCoverPageArchiveDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+                .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.BookCoverPageArchiveDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
                 .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
         var imageFileExtentions = booksFileStorageInfo
-                .FirstOrDefault(x => x.KeyName.Equals("ImageFileExtentions", StringComparison.InvariantCultureIgnoreCase))?.KeyValue
+                .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.ImageFileExtensions, StringComparison.InvariantCultureIgnoreCase))?.KeyValue
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(ext => ext.Trim())
                 .ToArray() ?? throw new ArgumentException("Valid file extension list not found!");
 
         var sourceFileDirectory = booksFileStorageInfo
-            .FirstOrDefault(x => x.KeyName.Equals("BookCoverPageDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.BookCoverPageDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? throw new ArgumentException("Source file directory path not found!");
 
         return new BookFileMapping()
@@ -328,16 +328,16 @@ internal class BookService : IBookService
     private async Task<BookFileMapping> AddBookPreviewFile(IFormFile file)
     {
         var booksFileStorageInfo = await _repositoryManager.ConfigRepository
-               .GetByKeyNameListAsync(new List<string>() { "BookPreviewDirectoryPath", "BookPreviewArchiveDirectoryPath" })
+               .GetByKeyNameListAsync(ConfigKeysConstants.BookPreviewConfigKeys)
                .ProjectTo<GetConfigsValueDto>(_mapper.ConfigurationProvider)
                .ToListAsync();
 
         var archiveDirectory = booksFileStorageInfo
-                    .FirstOrDefault(x => x.KeyName.Equals("BookPreviewArchiveDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+                    .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.BookPreviewArchiveDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
                     .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
         var sourceFileDirectory = booksFileStorageInfo
-                .FirstOrDefault(x => x.KeyName.Equals("BookPreviewDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+                .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.BookPreviewDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
                 .KeyValue ?? throw new ArgumentException("Source file directory path not found!");
 
         return new BookFileMapping()

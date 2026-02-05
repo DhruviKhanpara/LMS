@@ -1,6 +1,7 @@
 ﻿using LMS.Application.Contracts.DTOs.Membership;
 using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.Helpers;
 using LMS.Core.Enums;
 using LMS.Presentation.Attributes;
@@ -34,7 +35,7 @@ public class UserMembershipMappingController : Controller
         var isLogin = long.TryParse(_httpContext!.GetUserId(), out long authUserId);
 
         var loginUserMembership = await _serviceManager.UserMembershipMappingService.GetUserMembershipAsync<GetUserMembershipDto>(isActive: true, userId: authUserId);
-        long.TryParse((await _serviceManager.ConfigsService.GetConfigsByKeyName(new List<string> { "MaxActiveMembership" })).FirstOrDefault()?.KeyValue ?? "0", out long maxLimit);
+        long.TryParse((await _serviceManager.ConfigsService.GetConfigsByKeyName(new List<string> { ConfigKeysConstants.MaxActiveMembership })).FirstOrDefault()?.KeyValue ?? "0", out long maxLimit);
 
         var model = new PlanSelectionModelBodyViewModel()
         {
