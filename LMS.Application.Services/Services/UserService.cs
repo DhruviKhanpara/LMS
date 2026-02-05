@@ -420,20 +420,20 @@ internal class UserService : IUserService
     private async Task<string> AddUserProfile(IFormFile profilePhoto)
     {
         var profilePhotoStorageInfo = await _repositoryManager.ConfigRepository
-            .GetByKeyNameListAsync(new List<string>() { "ProfilePhotoDirectoryPath", "ProfilePhotoArchiveDirectoryPath", "ImageFileExtentions" })
+            .GetByKeyNameListAsync(ConfigKeysConstants.UserProfileConfigKeys)
             .ProjectTo<GetConfigsValueDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
         var sourceFileDirectory = profilePhotoStorageInfo
-            .FirstOrDefault(x => x.KeyName.Equals("ProfilePhotoDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.ProfilePhotoDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? throw new ArgumentException("Source file directory path not found!");
 
         var archiveDirectory = profilePhotoStorageInfo
-            .FirstOrDefault(x => x.KeyName.Equals("ProfilePhotoArchiveDirectoryPath", StringComparison.InvariantCultureIgnoreCase))?
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.ProfilePhotoArchiveDirectoryPath, StringComparison.InvariantCultureIgnoreCase))?
             .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 
         var imageFileExtentions = profilePhotoStorageInfo
-            .FirstOrDefault(x => x.KeyName.Equals("ImageFileExtentions", StringComparison.InvariantCultureIgnoreCase))?.KeyValue
+            .FirstOrDefault(x => x.KeyName.Equals(ConfigKeysConstants.ImageFileExtensions, StringComparison.InvariantCultureIgnoreCase))?.KeyValue
             .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(ext => ext.Trim())
             .ToArray() ?? throw new ArgumentException("Valid file extension list not found!");
@@ -444,7 +444,7 @@ internal class UserService : IUserService
     private async Task RemoveUserProfile(string profilePhotoPath)
     {
         var archiveDirectory = (await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("ProfilePhotoArchiveDirectoryPath")
+                .GetByKeyNameAsync(ConfigKeysConstants.ProfilePhotoArchiveDirectoryPath)
                 .FirstOrDefaultAsync())?
                 .KeyValue ?? throw new ArgumentException("Archive file directory path not found!");
 

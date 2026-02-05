@@ -6,6 +6,7 @@ using LMS.Application.Contracts.DTOs.UserMembershipMapping;
 using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Repositories;
 using LMS.Application.Contracts.Interfaces.Services;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Common.Models;
@@ -380,7 +381,7 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
     private async Task<long> GetMaxActiveMembership()
     {
         long.TryParse((await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("MaxActiveMembership")
+                .GetByKeyNameAsync(ConfigKeysConstants.MaxActiveMembership)
                 .FirstOrDefaultAsync())?.KeyValue ?? "0", out long maxActiveMembership);
         return maxActiveMembership;
     }
@@ -388,7 +389,7 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
     private async Task<long> GetNextPlanActivationTimeInMinutes()
     {
         long.TryParse((await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("NextPlanActivationTimeInMinutes")
+                .GetByKeyNameAsync(ConfigKeysConstants.NextPlanActivationTimeInMinutes)
                 .FirstOrDefaultAsync())?.KeyValue ?? "0", out long nextPlanActivationTimeInMinutes);
         return nextPlanActivationTimeInMinutes;
     }

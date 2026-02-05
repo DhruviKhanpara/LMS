@@ -1,8 +1,6 @@
 ﻿using LMS.Application.Contracts.DTOs;
-using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Services;
 using LMS.Common.Helpers;
-using LMS.Core.Enums;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 

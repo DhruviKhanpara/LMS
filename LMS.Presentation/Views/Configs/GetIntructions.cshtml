@@ -1,4 +1,5 @@
-﻿@using LMS.Presentation.HTMLHelper;
+﻿@using LMS.Application.Services.Constants
+@using LMS.Presentation.HTMLHelper;
 
 @model IEnumerable<LMS.Application.Contracts.DTOs.Configs.GetConfigsValueDto>
 
@@ -28,9 +29,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>User can hold assests as per their Current memberhsip plan limit: </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "BorrowLimit"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.BorrowLimit))
                     {
-                        <span>You can hold @Model.FirstOrDefault(x => x.KeyName == "BorrowLimit")?.KeyValue assests at a time</span>
+                        <span>
+                            You can hold @Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BorrowLimit)?.KeyValue assests at a time</span>
                     }
                     else
                     {
@@ -42,9 +44,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Once you hold the assests then after limited time </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "BorrowDueDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.BorrowDueDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "BorrowDueDays")?.KeyValue Days)</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BorrowDueDays)?.KeyValue Days)</span>
                     }
                 </b>
                 <span> you need to return/renew the assets otherwise penalty is applied to your holding and increase by time.</span>
@@ -53,9 +56,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>You may renew the asset up to a <b>predefined number of times</b></span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "MaxRenewCount"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.MaxRenewCount))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "MaxRenewCount")?.KeyValue times). </span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.MaxRenewCount)?.KeyValue times). </span>
                     }
                 </b>
                 <span> Once the renewal limit is reached, you must return the asset and submit a new issuance request if further use is required.</span>
@@ -64,9 +68,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>User can Reserve assests as per their Current memberhsip plan limit: </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "ReservationLimit"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.ReservationLimit))
                     {
-                        <span>You can reserve @Model.FirstOrDefault(x => x.KeyName == "ReservationLimit")?.KeyValue assests at a time</span>
+                        <span>
+                            You can reserve @Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.ReservationLimit)?.KeyValue assests at a time</span>
                     }
                     else
                     {
@@ -78,9 +83,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Once assests is allocated to your reservation then you have limited time </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "AllocationDueDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.AllocationDueDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "AllocationDueDays")?.KeyValue Days)</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.AllocationDueDays)?.KeyValue Days)</span>
                     }
                 </b>
                 <span> <b>to borrow/transfer it</b> after that your reservation automatically canceled.</span>
@@ -89,9 +95,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Once assests is allocated to your reservation and you <b>transfer it to other's then you get new allocation after some time</b></span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "DefalutAllocationDelayInDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.DefaultAllocationDelayInDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "DefalutAllocationDelayInDays")?.KeyValue Days).</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.DefaultAllocationDelayInDays)?.KeyValue Days).</span>
                     }
                 </b>
             </div>
@@ -99,9 +106,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Once assets are allocated to your reservation, you are permitted to <b>transfer them to others a limited number of times</b></span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "MaxTransferAllocationCount"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.MaxTransferAllocationCount))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "MaxTransferAllocationCount")?.KeyValue times).</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.MaxTransferAllocationCount)?.KeyValue times).</span>
                     }
                 </b>
                 <span>Upon exceeding this limit, you will need to either initiate a borrowing request or cancel the reservation. Otherwise, it will be automatically canceled once the allocation period ends.</span>
@@ -110,16 +118,18 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>User can have only </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "MaxActiveMembership"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.MaxActiveMembership))
                     {
-                        <span>@Model.FirstOrDefault(x => x.KeyName == "MaxActiveMembership")?.KeyValue</span>
+                        <span>
+                            @Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.MaxActiveMembership)?.KeyValue</span>
                     }
                 </b>
                 <span> <b>Active membership</b>in which <b>1</b> is active and next one will <b>became active after expiration</b> of active one in some time</span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "NextPlanActivationTimeInMinutes"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.NextPlanActivationTimeInMinutes))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "NextPlanActivationTimeInMinutes")?.KeyValue Minutes).</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.NextPlanActivationTimeInMinutes)?.KeyValue Minutes).</span>
                     }
                 </b>
             </div>
@@ -135,9 +145,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>After certain time </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "BorrowDueDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.BorrowDueDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "BorrowDueDays")?.KeyValue Days)</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BorrowDueDays)?.KeyValue Days)</span>
                     }
                 </b>
                 <span> of the holding assets if you not return/renew penalty will applied on that holding.</span>
@@ -150,9 +161,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Your <b>plan is expired and you haven't new plan</b> and also <b>hold assests based on the previous plan</b> then after some buffered time</span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "MembershipExpiryBufferDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.MembershipExpiryBufferDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "MembershipExpiryBufferDays")?.KeyValue Days)</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.MembershipExpiryBufferDays)?.KeyValue Days)</span>
                     }
                 </b>
                 <span> penalty is applied based on the number of holding so in this time return the assests or purchase new plan for continue.</span>
@@ -161,9 +173,10 @@
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>If you have active plan but you <b>hold more assest then your current plan based on your previous plan</b> then you have buffer time </span>
                 <b>
-                    @if (Model.Any(x => x.KeyName == "PreviousLimitCarryoverDays"))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PreviousLimitCarryoverDays))
                     {
-                        <span>(@Model.FirstOrDefault(x => x.KeyName == "PreviousLimitCarryoverDays")?.KeyValue Days)</span>
+                        <span>
+                            (@Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PreviousLimitCarryoverDays)?.KeyValue Days)</span>
                     }
                 </b>
                 <span> to return assests or upgrade your current plan other wise penalty is applied based on your extra holding.</span>
@@ -171,18 +184,24 @@
             <div class="px-1">
                 <i class="bi bi-vector-pen fs-4"></i>
                 <span>Penalty is calculated as bellow: ( </span>
-                <span>Base penalty: <b>@(Model.FirstOrDefault(x => x.KeyName == "BasePenaltyPerDay")?.KeyValue ?? "0") <i class="fa fa-inr" aria-hidden="true"></i> / Day</b>, </span>
-                <span>Interval Days: <b>@(Model.FirstOrDefault(x => x.KeyName == "PenaltyIncreaseDurationInDays")?.KeyValue ?? "0") Days</b>, </span>
-                <span>Increase Value: <b>@(Model.FirstOrDefault(x => x.KeyName == "PenaltyIncreaseDurationInDays")?.KeyValue ?? "0") <i class="fa fa-inr" aria-hidden="true"></i> / Day</b></span>
+                <span>
+                    Base penalty: <b>
+                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BasePenaltyPerDay)?.KeyValue ?? "0") <i class="fa fa - inr" aria-hidden="true"></i> / Day</b>, </span>
+                <span>
+                    Interval Days: <b>
+                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseDurationInDays)?.KeyValue ?? "0") Days</b>, </span>
+                <span>
+                    Increase Value: <b>
+                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseDurationInDays)?.KeyValue ?? "0") <i class="fa fa - inr" aria-hidden="true"></i> / Day</b></span>
                 )
                 <div class="bg-white rounded-4 mx-3 my-3 p-2">
-                    @if (Model.Any(x => x.KeyName == "PenaltyIncreaseType" && (x.KeyValue == "+" || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == " + " || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
                     {
                         <div class ="pb-3">PenalizedItemCount is number of extra holding or in case of the overdue it's 1</div>
                         <div>Penalty per day = BasePenalty + (Interval × IncreaseValue)</div>
                         <div>TotalPenalty = ∑ [PenaltyPerDay × PenalizedItemCount] for each overdue day</div>
                     }
-                    else @if (Model.Any(x => x.KeyName == "PenaltyIncreaseType" && (x.KeyValue == "+" || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
+                    else @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == " + " || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
                     {
                         <div>// PenalizedItemCount is number of extra holding or in case of the overdue it's 1</div>
                         <div>Penalty per day = BasePenalty × (IncreaseValue ^ Interval)</div>

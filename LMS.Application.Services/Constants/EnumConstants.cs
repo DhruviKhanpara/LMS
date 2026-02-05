@@ -2,7 +2,7 @@
 
 namespace LMS.Application.Services.Constants;
 
-public static class StatusGroups
+internal static class StatusGroups
 {
     #region Transaction Status Groups
 

@@ -1,6 +1,7 @@
 ﻿using LMS.Application.Contracts.DTOs;
 using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Repositories;
+using LMS.Application.Services.Constants;
 using LMS.Common.ErrorHandling.CustomException;
 using LMS.Common.Helpers;
 using LMS.Core.Entities;
@@ -414,7 +415,7 @@ public class NotificationService : INotificationService
     private async Task<(string, Dictionary<string, string>)> GetReservationAllocationTemplateInfo(object? data)
     {
         long.TryParse((await _repositoryManager.ConfigRepository
-                .GetByKeyNameAsync("AllocationDueDays")
+                .GetByKeyNameAsync(ConfigKeysConstants.AllocationDueDays)
                 .FirstOrDefaultAsync())?.KeyValue ?? "0", out long allocationDueDays);
 
         if (data != null && data is List<Reservation> reservations && reservations.Any())

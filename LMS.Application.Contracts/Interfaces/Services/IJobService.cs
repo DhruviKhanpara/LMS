@@ -1,6 +1,6 @@
 ﻿using LMS.Application.Contracts.DTOs;
 
-namespace LMS.Application.Contracts.Interfaces.Notification;
+namespace LMS.Application.Contracts.Interfaces.Services;
 
 public interface IJobService
 {

@@ -1,5 +1,6 @@
 ﻿using LMS.Application.Contracts.Interfaces.Notification;
 using LMS.Application.Contracts.Interfaces.Repositories;
+using LMS.Application.Services.Constants;
 using LMS.Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -66,13 +67,13 @@ internal class GenericOutboxProcessor : IOutboxProcessor
 
     private async Task<int> GetRetryDelayMinutes()
     {
-        int.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("OutboxMaxRetryDelayMinutes").FirstOrDefaultAsync())?.KeyValue ?? "0", out int retryDelayMinues);
+        int.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.OutboxMaxRetryDelayMinutes).FirstOrDefaultAsync())?.KeyValue ?? "0", out int retryDelayMinues);
         return retryDelayMinues;
     }
 
     private async Task<int> GetRetryCount()
     {
-        int.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync("OutboxMaxRetryCount").FirstOrDefaultAsync())?.KeyValue ?? "0", out int retryCount);
+        int.TryParse((await _repositoryManager.ConfigRepository.GetByKeyNameAsync(ConfigKeysConstants.OutboxMaxRetryCount).FirstOrDefaultAsync())?.KeyValue ?? "0", out int retryCount);
         return retryCount;
     }
 }
