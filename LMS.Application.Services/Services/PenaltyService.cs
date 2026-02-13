@@ -19,7 +19,7 @@ using System.Collections;
 
 namespace LMS.Application.Services.Services;
 
-internal class PenaltyService : IPenaltyService
+public class PenaltyService : IPenaltyService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly IValidationService _validationService;

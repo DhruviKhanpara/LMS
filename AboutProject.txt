@@ -1,6 +1,6 @@
-﻿🎬 Updated Demo Script: Library Management System
+﻿🎬 Demo Script: Library Management System
 🟢 Introduction
-“Welcome to the demo of my Library Management System — a full-stack, enterprise-grade solution built with .NET Core MVC, SQL Server, Hangfire, Serilog, FluentValidation, and Onion Architecture. This system is designed to manage books, memberships, reservations, penalties, and more, with robust role-based access and automated background jobs.”
+"Welcome to the demo of my Library Management System — a full-stack, enterprise-grade solution built with .NET Core MVC, SQL Server, Hangfire, Serilog, FluentValidation, and Onion Architecture. This system is designed to manage books, memberships, reservations, penalties, and more, with robust role-based access and automated background jobs. The system includes comprehensive unit and integration tests using xUnit and LocalDB to ensure reliability and maintainability."
 
 🗄️ Database & Architecture Overview
 Show schema with granular entities like BookFileMapping, OutBoxMessages, Configs, and StatusType.
@@ -12,60 +12,51 @@ Mention triggers for every CRUD operation to ensure traceability.
 Highlight Onion Architecture for clean separation of concerns.
 
 🔐 Authentication & Role-Based Dashboards
+
 Login as Admin
 
 Show JWT token-based login.
-
 Navigate to Admin Dashboard.
-
 Highlight full access to all modules and historical views via log tables.
-
 Show deleted vs active data toggle.
-
 Display Hangfire job health dashboard with execution stats.
 
 Login as Librarian
 
 Show CRUD access to books, reservations, penalties, etc.
-
 Demonstrate penalty waiver flow.
-
 Point out limited visibility (no logs, no deleted data).
 
 Login as User
 
 Show card-based dashboard with personal reservations, penalties, and memberships.
-
 Display Instruction Page with rules and policies.
-
 Attempt an action with unpaid penalty to show restriction.
 
 📚 Book & Membership Management
+
 Admin adds a book
 
 Show FluentValidation in action.
-
 Upload cover image (required), optional preview PDF.
 
 Librarian edits book
 
 Use inline modal for editing.
-
 Save and show update reflected instantly.
 
 User views Discover Books
 
 Show card layout.
-
 Explain login requirement for full details.
 
 User purchases membership
 
 Show active and queued memberships (max 2).
-
 Explain buffer time and upgrade logic.
 
 📅 Reservation & Borrowing Flow
+
 User reserves a book
 
 Show reservation form and priority logic.
@@ -73,7 +64,6 @@ Show reservation form and priority logic.
 Admin allocates reservation
 
 Explain 3-day pickup window (configurable).
-
 Show auto-cancellation and reallocation via Hangfire.
 
 User borrows a book
@@ -81,10 +71,10 @@ User borrows a book
 Show available count decrement and status change.
 
 💸 Penalty System
+
 User misses return deadline
 
 Show penalty escalation (₹5/day → ₹10/day).
-
 Display penalty status as Unpaid.
 
 User dashboard access blocked
@@ -96,19 +86,21 @@ Librarian waives penalty
 Demonstrate waiver flow with reason.
 
 🧠 Background Jobs (Hangfire)
-Job Name	Frequency	Purpose
-Due Date Reminder	Daily (morning)	Notify users of upcoming returns
-Reservation Allocation	Daily	Assign books to top-priority reservations
-Expired Membership Cleanup	Daily	Remove outdated plans
-Penalty Calculation	Daily	Apply overdue penalties
-Allocation Reminder	Daily	Alert users of pending pickups
-Expired Allocation Reallocation	Daily	Reassign unclaimed reservations
-Email Dispatch	Every 5 minutes	Send notifications and alerts
-Show Hangfire dashboard with job health and execution metrics.
 
+Job Name						Frequency		Purpose
+Due Date Reminder				Daily (morning)	Notify users of upcoming returns
+Reservation Allocation			Daily			Assign books to top-priority reservations
+Expired Membership Cleanup		Daily			Remove outdated plans
+Penalty Calculation				Daily			Apply overdue penalties
+Allocation Reminder				Daily			Alert users of pending pickups
+Expired Allocation Reallocation	Daily			Reassign unclaimed reservations
+Email Dispatch					Every 5 minutes	Send notifications and alerts
+
+Show Hangfire dashboard with job health and execution metrics.
 Mention lightweight page refresh logic for real-time consistency.
 
 📊 Admin Dashboard & Logs
+
 View Charts (Chart.js)
 
 Show most borrowed books, overdue trends, membership stats.
@@ -116,7 +108,6 @@ Show most borrowed books, overdue trends, membership stats.
 View Logs
 
 SystemLog, CommunicationLog, ExceptionLog.
-
 Filter by operation, user, date range.
 
 View Record History
@@ -124,21 +115,32 @@ View Record History
 Open any entity → click “History” → show log entries.
 
 🖼️ UI/UX Highlights
+
 Table view for Admin/Librarian, card view for Users.
-
 Inline modals for editing — no full page reloads.
-
 Server-side pagination, sorting, and filtering — optimized for performance.
 
+🧪 Testing & Quality Assurance
+
+Unit Testing with xUnit
+FluentValidation Tests
+Integration Testing with xUnit & LocalDB - Penalty Calculation Integration Test
+
+Test Coverage Highlights
+
+✅ Unit Tests: 45+ tests covering validators, business logic, and edge cases
+✅ Integration Tests: 20+ tests for penalty calculation, reservation flow, and membership logic
+✅ LocalDB: Isolated test database ensures no pollution of production data
+
 🏁 Conclusion
-“This system demonstrates a scalable, secure, and user-friendly library management solution. With background automation, audit-ready logging, and role-based access, it’s ready for real-world deployment or further extension into mobile and API layers.”
+"This system demonstrates a scalable, secure, and user-friendly library management solution. With background automation, audit-ready logging, role-based access, and comprehensive test coverage ensuring reliability, it's ready for real-world deployment or further extension into mobile and API layers."
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 I create a demo project Library management system with following features,
 
 - Database 
- - Book, Genre, Membership, UserMembership, Penalty, Transections, Reservation, User, BookFileMapping, OutBoxMessages, RoleList, Status, PenaltyType, Configs, StatusType
+ - Book, Genre, Membership, UserMembership, Penalty, Transactions, Reservation, User, BookFileMapping, OutBoxMessages, RoleList, Status, PenaltyType, Configs, StatusType
  - individual Log table for all the table, SystemLog Table, CommunicationLog Table, ExceptionLog table
  - All table have trigger for add update and delete to add log to the log table about every single update in original table
  - Have Hangfire Tables
@@ -182,11 +184,11 @@ Access to all page -
  - define in config like initial 5Rs., Interval 5 days, method addition, update penalty by 5 Rs (for first 5 day per day 5Rs, next 5 day per day 10Rs)
  - If user have penalty then Can't do anything from their deshboard first pay the penalty
  - penalty can applied for - If membership is over and define buffer time is also over then add penalty per book - If new mwmbership is active and it's limit is less the perivious and you already have assessts as per last membership and buffer time is over then penalty on extra holding per each assest
- - Librarian can Wived the penalty if they found any valid reason
+ - Librarian can Waived the penalty if they found any valid reason
  - reservation status - reserved, allocated, fullfilled, cancel
- - transection status - borrowed, renew, return, overdue, cancel, claimLoast
- - penalty status - paid, unpaid, wived
- - book status - available, loast-dameged, reserved, check-out, removed, onhold
+ - transection status - borrowed, renew, return, overdue, cancel, claimLost
+ - penalty status - paid, unpaid, waived
+ - book status - available, lost-dameged, reserved, check-out, removed, onhold
 - When book is removed from the library then it's not available for new borrowing but for those who already have the book then staus became removed after collect all the book it will deleted, and this time if any reservation is there then it will automatically cancled.
 - User can download their library card
 
@@ -201,5 +203,6 @@ Access to all page -
 - for the Librarian and Admin - For edit and add create a model like open on the same page not new entire page loading
 - table have soring on the column, add the required filter on top of screen if required, add pagination also, pagination, soring from the database side not like load all data and just show the data based on the parameter
 
+- also add some example test case like unit test for validation and service testing and integration test for calculate penalty method using xunit, localdb using some proper centralized helper methods to make it scallable if want to add test cases for other services / bussiness logic
 
 I have this demo using .NET Core MVC, SQL server, Hangfire, Serilog, JQuery, Onion architechture, and add indexs in log table which table is use in UI for admin, use fluent validation, use chart.js for show the chart in deshboard

@@ -186,22 +186,22 @@
                 <span>Penalty is calculated as bellow: ( </span>
                 <span>
                     Base penalty: <b>
-                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BasePenaltyPerDay)?.KeyValue ?? "0") <i class="fa fa - inr" aria-hidden="true"></i> / Day</b>, </span>
+                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.BasePenaltyPerDay)?.KeyValue ?? "0") <i class="fa fa-inr" aria-hidden="true"></i> / Day</b>, </span>
                 <span>
                     Interval Days: <b>
                         @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseDurationInDays)?.KeyValue ?? "0") Days</b>, </span>
                 <span>
                     Increase Value: <b>
-                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseDurationInDays)?.KeyValue ?? "0") <i class="fa fa - inr" aria-hidden="true"></i> / Day</b></span>
+                        @(Model.FirstOrDefault(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseDurationInDays)?.KeyValue ?? "0") <i class="fa fa-inr" aria-hidden="true"></i> / Day</b></span>
                 )
                 <div class="bg-white rounded-4 mx-3 my-3 p-2">
-                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == " + " || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
+                    @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == "+" || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
                     {
                         <div class ="pb-3">PenalizedItemCount is number of extra holding or in case of the overdue it's 1</div>
                         <div>Penalty per day = BasePenalty + (Interval × IncreaseValue)</div>
                         <div>TotalPenalty = ∑ [PenaltyPerDay × PenalizedItemCount] for each overdue day</div>
                     }
-                    else @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == " + " || x.KeyValue.Equals("add", StringComparison.InvariantCultureIgnoreCase))))
+                    else @if (Model.Any(x => x.KeyName == ConfigKeysConstants.PenaltyIncreaseType && (x.KeyValue == "*" || x.KeyValue.Equals("multiply", StringComparison.InvariantCultureIgnoreCase))))
                     {
                         <div>// PenalizedItemCount is number of extra holding or in case of the overdue it's 1</div>
                         <div>Penalty per day = BasePenalty × (IncreaseValue ^ Interval)</div>
