@@ -214,7 +214,7 @@
             toastr.error(errorToastMessage, "Error");
         }
 
-        var deleteStatusLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => isAdmin || m.StatusLabel != @unpaidStatus)));
+        var deleteStatusLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => @isAdmin || m.StatusLabel != @unpaidStatus)));
         var transectionLookup = @Html.Raw(Json.Serialize(Model.Data?.ToDictionary(m => m.Id, m => m.TransectionId != null && m.TransectionId != 0)));
 
         $(".penalty-delete-btn").each(function ()

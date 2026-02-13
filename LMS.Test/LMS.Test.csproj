@@ -25,4 +25,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LMS.Application.Contracts\LMS.Application.Contracts.csproj" />
+    <ProjectReference Include="..\LMS.Application.Services\LMS.Application.Services.csproj" />
+    <ProjectReference Include="..\LMS.Core\LMS.Core.csproj" />
+    <ProjectReference Include="..\LMS.Infrastructure\LMS.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

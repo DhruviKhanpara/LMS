@@ -11,7 +11,7 @@ public class PenaltyMapperProfile : Profile
     public PenaltyMapperProfile()
     {
         CreateMap<Penalty, GetPenaltyDto>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()))
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}"))
             .ForMember(dest => dest.UserProfilePhoto, src => src.MapFrom(act => !string.IsNullOrWhiteSpace(act.User.ProfilePhoto) ? "/" + act.User.ProfilePhoto : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s"))
             .ForMember(dest => dest.TransectionDueDate, src => src.MapFrom(act => act.Transection != null ? act.Transection.DueDate : (DateTimeOffset?)null))
             .ForMember(dest => dest.StatusLabel, src => src.MapFrom(act => act.Status.Label))
@@ -22,7 +22,7 @@ public class PenaltyMapperProfile : Profile
             .ForMember(dest => dest.IsRemoved, src => src.MapFrom(act => !act.IsActive));
 
         CreateMap<Penalty, ExportPenaltyDto>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()))
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}"))
             .ForMember(dest => dest.TransectionDueDate, src => src.MapFrom(act => act.Transection != null ? act.Transection.DueDate : (DateTimeOffset?)null))
             .ForMember(dest => dest.StatusLabel, src => src.MapFrom(act => act.Status.Label))
             .ForMember(dest => dest.PenaltyTypeName, src => src.MapFrom(act => act.PenaltyType.Label))
@@ -30,7 +30,7 @@ public class PenaltyMapperProfile : Profile
             .ForMember(dest => dest.IsRemoved, src => src.MapFrom(act => !act.IsActive));
 
         CreateMap<Penalty, PenaltyData>()
-            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}".Trim()))
+            .ForMember(dest => dest.UserName, src => src.MapFrom(act => $"{act.User.FirstName} {act.User.MiddleName ?? ""}".Trim() + $" {act.User.LastName ?? ""}"))
             .ForMember(dest => dest.UserProfilePhoto, src => src.MapFrom(act => !string.IsNullOrWhiteSpace(act.User.ProfilePhoto) ? "/" + act.User.ProfilePhoto : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG2h3dtkFclxksGm2bXE8R53sUemVyVGmJTg&s"))
             .ForMember(dest => dest.PenaltyTypeName, src => src.MapFrom(act => act.PenaltyType.Label));
 

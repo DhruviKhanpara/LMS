@@ -161,7 +161,7 @@
         var isAllocated = @Html.Raw(Json.Serialize(Model.IsAllocated));
         var statusId = @Html.Raw(Json.Serialize(Model.StatusId));
 
-        if (!(isAllocated === true && statusId === allocateStatusId))
+        if (!(isAllocated === true && statusId === @allocateStatusId))
         {
             readonlyField("#updateReservationForm #IsAllocated");
         }

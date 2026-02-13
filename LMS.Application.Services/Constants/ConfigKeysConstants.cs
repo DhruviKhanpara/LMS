@@ -110,32 +110,57 @@ public static class ConfigKeysConstants
 
     /// <summary> 
     /// Collection of all penalty-related configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes: BasePenaltyPerDay, PenaltyIncreaseType, PenaltyIncreaseValue, PenaltyIncreaseDurationInDays
+    /// </remarks>
     public static readonly List<string> PenaltyConfigKeys = new List<string> { BasePenaltyPerDay, PenaltyIncreaseType, PenaltyIncreaseValue, PenaltyIncreaseDurationInDays };
 
     /// <summary> 
     /// Collection of all buffer time-related configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes: PreviousLimitCarryoverDays, MembershipExpiryBufferDays
+    /// </remarks>
     public static readonly List<string> BufferTimeConfigKeys = new List<string> { PreviousLimitCarryoverDays, MembershipExpiryBufferDays };
 
     /// <summary> 
     /// Collection of all BookCover-related configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes: BookCoverPageDirectoryPath, BookCoverPageArchiveDirectoryPath, ImageFileExtensions
+    /// </remarks>
     public static readonly List<string> BookCoverConfigKeys = new List<string> { BookCoverPageDirectoryPath, BookCoverPageArchiveDirectoryPath, ImageFileExtensions };
 
     /// <summary> 
     /// Collection of all UserProfile-related configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes: ProfilePhotoDirectoryPath, ProfilePhotoArchiveDirectoryPath, ImageFileExtensions
+    /// </remarks>
     public static readonly List<string> UserProfileConfigKeys = new List<string> { ProfilePhotoDirectoryPath, ProfilePhotoArchiveDirectoryPath, ImageFileExtensions };
 
     /// <summary> 
     /// Collection of all BookPreview-related configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes: BookPreviewDirectoryPath, BookPreviewArchiveDirectoryPath
+    /// </remarks>
     public static readonly List<string> BookPreviewConfigKeys = new List<string> { BookPreviewDirectoryPath, BookPreviewArchiveDirectoryPath };
 
     /// <summary> 
     /// Collection of all Job-specific configuration keys. 
-    /// </summary> 
+    /// </summary>
+    /// <remarks>
+    /// Includes:
+    /// ProcessGenericOutbox_Frequency, ProcessGenericOutbox_Interval, ProcessGenericOutbox_Time,
+    /// MembershipDueReminder_Frequency, MembershipDueReminder_Interval, MembershipDueReminder_Time,
+    /// PenaltyCalculation_Frequency, PenaltyCalculation_Interval, PenaltyCalculation_Time,
+    /// ReallocateExpiredReservations_Frequency, ReallocateExpiredReservations_Interval, ReallocateExpiredReservations_Time,
+    /// AllocateReservedBooks_Frequency, AllocateReservedBooks_Interval, AllocateReservedBooks_Time,
+    /// DueDateReminder_Frequency, DueDateReminder_Interval, DueDateReminder_Time,
+    /// NotifyReservationAllocation_Frequency, NotifyReservationAllocation_Interval, NotifyReservationAllocation_Time
+    /// </remarks>
     public static readonly List<string> JobsConfigKeys = new List<string> 
     {
         ProcessGenericOutbox_Frequency, ProcessGenericOutbox_Interval, ProcessGenericOutbox_Time,

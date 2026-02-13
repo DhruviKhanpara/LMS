@@ -8,6 +8,8 @@ public partial class Status : Audit
     #region Table References
     [ForeignKey(nameof(CreatedBy))]
     public virtual User? CreatedByUser { get; set; }
+    [ForeignKey(nameof(StatusTypeId))]
+    public virtual StatusType? StatusType { get; set; }
     public virtual ICollection<Books> Books { get; set; } = new List<Books>();
     public virtual ICollection<Penalty> Penalties { get; set; } = new List<Penalty>();
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

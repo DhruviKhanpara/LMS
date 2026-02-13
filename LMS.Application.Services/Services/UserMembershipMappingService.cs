@@ -197,6 +197,7 @@ internal class UserMembershipMappingService : IUserMembershipMappingService
         var newUserMembership = await _repositoryManager.UserMembershipMappingRepository
             .GetByIdAsync(userMembership.Id)
             .Include(x => x.User)
+            .Include(x => x.Membership)
             .FirstOrDefaultAsync();
 
         if (newUserMembership is not null)
